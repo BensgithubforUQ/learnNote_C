@@ -23,6 +23,10 @@ Manager::Manager(string n, int id, int d_id) {
 	this->w_department_id = d_id;
 
 }
+Manager::Manager() {
+
+}
+
 Manager::~Manager() {
 
 }

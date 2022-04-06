@@ -3,6 +3,7 @@
 
 class Manager : public AbstractWorker {
 public:
+	Manager();
 	Manager(string n, int id, int d_id);
 	~Manager();
 	void showPersonalInfo();

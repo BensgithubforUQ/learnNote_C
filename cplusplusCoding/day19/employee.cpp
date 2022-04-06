@@ -23,6 +23,10 @@ Employee::Employee(string n, int id, int d_id) {
 	this->w_department_id = d_id;
 
 }
+Employee::Employee() {
+
+}
+
 Employee::~Employee() {
 
 }

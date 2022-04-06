@@ -3,6 +3,7 @@
 
 class Boss : public AbstractWorker {
 public:
+	Boss();
 	Boss(string n, int id, int d_id);
 	~Boss();
 	void showPersonalInfo();

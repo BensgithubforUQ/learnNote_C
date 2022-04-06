@@ -23,6 +23,11 @@ Boss::Boss(string n, int id, int d_id) {
 
 	}
 }
+
+Boss::Boss() {
+
+}
+
 Boss::~Boss() {
 
 }

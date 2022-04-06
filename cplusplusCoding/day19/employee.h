@@ -19,6 +19,7 @@
 //∆’Õ®πÕ‘±¿‡
 class Employee : public AbstractWorker {
 public:
+	Employee();
 	Employee(string n,int id,int d_id);
 	~Employee();
 	void showPersonalInfo();
