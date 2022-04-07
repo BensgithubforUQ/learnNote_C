@@ -29,13 +29,16 @@ int main() {
 			wm.delete_Worker();
 			break;
 		case 4://修改职工
+			wm.change_worker_info();
 			break;
 		case 5://查找职工
 			wm.search_Worker();
 			break;
 		case 6://排序职工
+			wm.sort_Worker();
 			break;
 		case 7://清空数据
+			wm.delete_all_data();
 			break; 
 		defualt:
 			system("cls");

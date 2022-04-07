@@ -2,6 +2,7 @@
 #include "boss.h"
 #include "employee.h"
 #include "manager.h"
+#include <vector>
 constexpr auto fileName = "workermanager_data.txt";
 
 WorkerManager::WorkerManager() {//构造函数
@@ -42,9 +43,16 @@ WorkerManager::WorkerManager() {//构造函数
 WorkerManager::~WorkerManager() {//析构函数
 	//析构，堆区数据，手动开辟，手动释放，养成好习惯
 	if (this->worker_array != NULL) {
+		//删除堆区的每个职工对象，然后还需要删除堆区这个数组的指针、
+		for (int i = 0; i < this->worker_size; i++) {
+			delete this->worker_array[i];
+			this->worker_array[i] = NULL;
+		}
+		//删除数组指针
 		delete[] this->worker_array;
 		this->worker_array = NULL;
-		cout << "成功析构workermanager对象" << endl;
+		this->worker_size = 0;
+		this->fileIsEmpty = true;
 	}
 }
 
@@ -67,6 +75,16 @@ void WorkerManager::exit_Menu() {
 	exit(0);
 }
 
+int WorkerManager::check_same_id(int id) {
+	for (int i = 0; i < this->worker_size; i++) {
+		if (id == this->worker_array[i]->w_person_id) {
+			cout << "id重复，请重新输入" << endl;
+			return 1;
+		}
+	}
+	return 0;
+}
+
 void WorkerManager::addEmployee() {
 	cout << "请输入想要增加的职工的个数" << endl;
 	int addNum = 0;
@@ -86,7 +104,10 @@ void WorkerManager::addEmployee() {
 			 string name;
 			 int d_id;
 			 cout << "请输入第 " << j + 1 << "个用户的编号" << endl;
-			 cin >> id;
+			 do
+			 {
+				 cin >> id;
+			 } while (check_same_id(id));
 			 cout << "请输入第 " << j + 1 << "个用户的名字" << endl;
 			 cin >> name;
 			 cout << "请选择第 " << j + 1 << "个用户的岗位" << endl;
@@ -106,6 +127,8 @@ void WorkerManager::addEmployee() {
 				 worker = new Employee(name, id, d_id);
 				 break;
 			 default:
+				 cout << "警告，初始化分类为普通员工" << endl;
+				 worker = new Employee(name, id, d_id);
 				 break;
 			 }
 			 new_worker_array[this->worker_size + j] = worker;
@@ -131,7 +154,7 @@ void WorkerManager::addEmployee() {
 void WorkerManager::save_file() {
 	ofstream ofs;//定义流对象
 	//打开,用输出的模式打开，意思就是写文件
-	ofs.open(fileName, ios::out|ios::trunc);
+	ofs.open(fileName, ios::out);
 	//for循环，把记录的人输入到文件中
 	for (int i = 0; i < this->worker_size; i++) {
 		ofs << this->worker_array[i]->w_person_id << " "
@@ -192,15 +215,27 @@ void WorkerManager::show_WorkerInfo() {
 	system("pause");
 	system("cls");
 }
-int WorkerManager::isExist(string name) {
+int WorkerManager::isExist(string name, vector<int> id_vector) {
+	bool flag = false;
+	int id;
 	for (int i = 0; i < this->worker_size; i++) {
 		if (this->worker_array[i]->w_name == name) {
 			cout << "存在该职工" << endl;
-			return i;
+			flag = true;
+			id_vector.push_back(i);
+			cout << "工号：" << this->worker_array[i]->w_person_id << " "
+				<< "姓名： " << this->worker_array[i]->w_name << " "
+				<< "部门编号： " << this->worker_array[i]->w_department_id << endl;
+			id = i;
 		}
 	}
-	cout << "职工不存在" << endl;
-	return -1;
+	if (flag) {
+		return id;
+	}
+	else {
+		cout << "职工不存在" << endl;
+		return -1;
+	}
 }
 int WorkerManager::isExist(int id) {
 	for (int i = 0; i < this->worker_size; i++) {
@@ -212,6 +247,38 @@ int WorkerManager::isExist(int id) {
 	cout << "职工不存在" << endl;
 	return -1;
 }
+
+int WorkerManager::search_Worker_withName(vector<int> id_vector) {
+	cout << "请输入名字" << endl;
+	string name;
+	cin >> name;
+	int id = this->isExist(name, id_vector);
+	if (id != -1) {
+		for (int i : id_vector) {
+			cout << "职工信息为：" << endl;
+			cout << "工号：" << this->worker_array[i]->w_person_id << " "
+				<< "姓名： " << this->worker_array[i]->w_name << " "
+				<< "部门编号： " << this->worker_array[i]->w_department_id << endl;
+		}
+
+	}
+	return id;
+}
+
+int WorkerManager::search_Worker_withId() {
+	cout << "请输入编号" << endl;
+	int search_id;
+	cin >> search_id;
+	int id = this->isExist(search_id);
+	if (id != -1) {
+		cout << "职工信息为：" << endl;
+		cout << "工号：" << this->worker_array[id]->w_person_id << " "
+			<< "姓名： " << this->worker_array[id]->w_name << " "
+			<< "部门编号： " << this->worker_array[id]->w_department_id << endl;
+	}
+	return id;
+}
+
 void WorkerManager::search_Worker() {
 	cout << "请选择你要如何查询职工" << endl
 		<< "1.根据名字查询" << endl
@@ -219,37 +286,22 @@ void WorkerManager::search_Worker() {
 	int choice;
 	cin >> choice;
 	if (choice == 1) {
-		cout << "请输入名字" << endl;
-		string name;
-		cin >> name;
-		int id = this->isExist(name);
-		if (id != -1) {
-			cout << "职工信息为：" << endl;
-			cout << "工号：" << this->worker_array[id]->w_person_id << " "
-				<< "姓名： " << this->worker_array[id]->w_name << " "
-				<< "部门编号： " << this->worker_array[id]->w_department_id << endl;
-		}
+		search_Worker_withId();
 	}
 	else if (choice == 2) {
-		cout << "请输入编号" << endl;
-		int search_id;
-		cin >> search_id;
-		int id = this->isExist(search_id);
-		if (id != -1) {
-			cout << "职工信息为：" << endl;
-			cout << "工号：" << this->worker_array[id]->w_person_id << " "
-				<< "姓名： " << this->worker_array[id]->w_name << " "
-				<< "部门编号： " << this->worker_array[id]->w_department_id << endl;
-		}
+		vector<int> id_vector;
+		search_Worker_withName(id_vector);
 	}
 	system("pause");
+
+
 	system("cls");
 }
 void WorkerManager::confirm_delete(int id) {
-	cout << "真的要删除该职工的信息吗?是请输入Y，否则取消" << endl;
+	cout << "真的要删除该职工的信息吗?是请输入Y/y，否则取消" << endl;
 	char make_Sure;
 	cin >> make_Sure;
-	if (make_Sure == 'Y') {
+	if (make_Sure == 'Y'|| make_Sure == 'y') {
 		this->worker_array[id] = this->worker_array[this->worker_size - 1];
 		this->worker_array[this->worker_size - 1] = NULL;
 		--this->worker_size;
@@ -262,35 +314,113 @@ void WorkerManager::confirm_delete(int id) {
 }
 void WorkerManager::delete_Worker() {
 	cout << "请选择你要如何查询职工" << endl
-		<< "1.根据名字查询" << endl
-		<< "2.根据id查询" << endl;
+		<< "1.根据id查询" << endl
+		<< "2.根据名字查询" << endl;
 	int choice;
 	cin >> choice;
 	if (choice == 1) {
-		cout << "请输入名字" << endl;
-		string name;
-		cin >> name;
-		int id = this->isExist(name);
+		int id = search_Worker_withId();
 		if (id != -1) {
-			cout << "职工信息为：" << endl;
-			cout << "工号：" << this->worker_array[id]->w_person_id << " "
-				<< "姓名： " << this->worker_array[id]->w_name << " "
-				<< "部门编号： " << this->worker_array[id]->w_department_id << endl;
+			this->confirm_delete(id);
 		}
-		this->confirm_delete(id);
 	}
 	else if (choice == 2) {
-		cout << "请输入编号" << endl;
-		int search_id;
-		cin >> search_id;
-		int id = this->isExist(search_id);
+		vector<int> id_vector;
+		int id = search_Worker_withName(id_vector);
 		if (id != -1) {
-			cout << "职工信息为：" << endl;
-			cout << "工号：" << this->worker_array[id]->w_person_id << " "
-				<< "姓名： " << this->worker_array[id]->w_name << " "
-				<< "部门编号： " << this->worker_array[id]->w_department_id << endl;
+			this->confirm_delete(id);
 		}
-		this->confirm_delete(id);
+	}
+	system("pause");
+	system("cls");
+}
+
+void WorkerManager::change_worker_info() {
+	cout << "请选择你要如何查询职工" << endl
+		<< "1.根据id查询" << endl
+		<< "2.根据名字查询" << endl;
+	int choice;
+	cin >> choice;
+	vector<int> id_vector;
+	int id = 0;
+	if (choice == 1) {
+		id = search_Worker_withId();
+	}
+	else if (choice == 2) {
+		
+		id = search_Worker_withName(id_vector);
+	}
+	if (id != -1) {
+			cout << "请输入修改后的员工姓名：" << endl;
+			getchar();//停止一下，因为要输入一个回车
+			getline(cin, this->worker_array[id]->w_name);
+			cout << "请输入修改后的员工部门编号：" << endl;
+			int d_id;
+			cin >> d_id;
+			this->worker_array[id]->w_department_id = d_id;
+
+		
+		this->save_file();
+		cout << "修改成功......" << endl;
+	}
+	system("pause");
+	system("cls");
+}
+
+void WorkerManager::sort_Worker() {
+	if (this->fileIsEmpty) {
+		cout << "空文件" << endl;
+	}
+	else {
+		for (int i = 0; i < this->worker_size; i++) {
+			for (int j = i + 1; j < this->worker_size; j++) {
+				if (this->worker_array[i]->w_person_id > this->worker_array[j]->w_person_id) {
+					int temp_id;
+					int temp_d_id;
+					string temp_name;
+					temp_id = this->worker_array[i]->w_person_id;
+					temp_d_id = this->worker_array[i]->w_department_id;
+					temp_name = this->worker_array[i]->w_name;
+					this->worker_array[i]->w_person_id = this->worker_array[j]->w_person_id;
+					this->worker_array[i]->w_department_id = this->worker_array[j]->w_department_id;
+					this->worker_array[i]->w_name = this->worker_array[j]->w_name;
+					this->worker_array[j]->w_person_id = temp_id;
+					this->worker_array[j]->w_department_id = temp_d_id;
+					this->worker_array[j]->w_name = temp_name;
+
+				}
+			}
+		}
+	}
+	this->save_file();
+	cout << "排序完毕" << endl;
+	system("pause");
+	system("cls");
+}
+
+void WorkerManager::delete_all_data() {
+	cout << "确定删除？输入Y/y，其他取消" << endl;
+	char confirm;
+	cin >> confirm;
+	if (confirm == 'y' || confirm == 'Y') {
+		ofstream ofs(fileName,ios::trunc);//先把文件删除重新建个空的
+		ofs.close();
+		if (this->worker_array != NULL) {
+			//相当于主动析构
+			for (int i = 0; i < this->worker_size; i++) {
+				delete this->worker_array[i];
+				this->worker_array[i] = NULL;
+			}
+			//删除数组指针
+			delete[] this->worker_array;
+			this->worker_array = NULL;
+			this->worker_size = 0;
+			this->fileIsEmpty = true;
+			cout << "数据已经全部删除完毕" << endl;
+		}
+		else {
+			cout << "文件为空，不可删除" << endl;
+		}
 	}
 	system("pause");
 	system("cls");
