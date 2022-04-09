@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="virtual_father.cpp" />
     <ClCompile Include="virtual_son_template.cpp" />
+    <ClCompile Include="案例_数组封装.cpp" />
     <ClCompile Include="模板.cpp" />
     <ClCompile Include="模板的局限性.cpp" />
     <ClCompile Include="类模板.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="类模板的分文件编写.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="goldenFingerArray.hpp" />
     <ClInclude Include="virtual_father.hpp" />
     <ClInclude Include="virtual_son_template.hpp" />
   </ItemGroup>

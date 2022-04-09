@@ -36,12 +36,18 @@
     <ClCompile Include="类模板的分文件编写.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="案例_数组封装.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="virtual_father.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="virtual_son_template.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="goldenFingerArray.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
