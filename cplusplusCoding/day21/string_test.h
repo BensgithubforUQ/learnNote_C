@@ -80,3 +80,29 @@ void test_string2() {
 	s4.append("i have a dream that came true", 2, 25);
 	cout << s4 << endl;
 }
+
+void test_string3() {
+	//查找
+	string s1 = "abcdefghde";
+	//需要查找s1中是否有子串“de"
+	//int find(const string & str, int pos = 0)const;
+	//pos是起始位置，因为默认为0，所以可以不输入
+	string target_s1 = "de";
+	int target_postion = s1.find(target_s1);
+	cout << "de的位置是：" << target_postion << endl;//存在该值的时候
+	target_s1 = "ed";
+	target_postion = s1.find(target_s1);
+	cout << "de的位置是：" << target_postion << endl;//不存在该值的时候，输出-1
+	//因此这个可以用作判断
+	target_postion = s1.rfind("de");
+	cout << "de的位置是（rfind）：" << target_postion << endl;
+	//rfind是从右往左查
+}
+
+void test_string4() {
+	//替换 replace
+	string s1 = "abcdefgh";
+	s1.replace(1, 3, "1111");
+	cout << "替换1-3号字符为1111：" << s1 << endl;//从1号位置开始，到，3号位置，替换为1111，注意是直接替换
+	//无所谓替换成几个字符。
+}
