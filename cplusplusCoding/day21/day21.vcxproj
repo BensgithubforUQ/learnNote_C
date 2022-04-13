@@ -139,12 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="deque容器.cpp" />
     <ClCompile Include="person.cpp" />
     <ClCompile Include="STL初识cpp.cpp" />
     <ClCompile Include="string容器.cpp" />
     <ClCompile Include="vector容器.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="deque_test.h" />
     <ClInclude Include="person.h" />
     <ClInclude Include="string_test.h" />
     <ClInclude Include="vector_test.h" />

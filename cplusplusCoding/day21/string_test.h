@@ -106,3 +106,49 @@ void test_string4() {
 	cout << "替换1-3号字符为1111：" << s1 << endl;//从1号位置开始，到，3号位置，替换为1111，注意是直接替换
 	//无所谓替换成几个字符。
 }
+
+void test_string5() {
+	//字符存取的操作
+	string s1 = "abcdefghi";
+	cout << "s1: " << s1 << endl;
+	cout << "size of s1 is :" << sizeof(s1[0]) / sizeof(s1)<<endl;
+	cout << "size of s1 is :" << s1.size() << endl;//封装了这个方法，和上面那个一样
+	cout << "output the 5th element with []:" << s1[4] <<endl;
+	cout << "output the 5th element with at:" << s1.at(4) << endl;
+	//字符修改
+	s1[4] = '1';
+	cout << "output the 5th element with []:" << s1[4] << endl;
+	s1.at(4) = '2';
+	cout << "output the 5th element with at:" << s1.at(4) << endl;
+
+}
+
+void test_string6() {
+	//字符串的插入和删除
+	//insert
+	string s1 = "abcd";//原字符串
+	s1.insert(1, "111");
+	cout << "在第1个位置，插入“111”：" << s1 << endl;
+	string s2 = "efg";
+	s1.insert(1, s2);
+	cout << "在第1个位置，插入字符串说：" << s1 << endl;
+	//删除erase
+	s1.erase(1, 3);//从第n个位置开始，删除m个，记住起始坐标从0开始
+	cout << "从第1个位置开始，删除3个字符" << s1 << endl;
+}
+
+void test_string7() {
+	//子串
+	//substring（int pos，int npos）从第pos位置开始，截出一个npos长度的子串，返回
+	string s1 = "abcdef";
+	string s2 = s1.substr(1, 3);
+	cout << "从第1个位置开始，截一个长度为3的字符串" << s2 << endl;
+}
+
+void test_string8() {
+	//实际操作，取邮箱@前的用户名
+	string s_email = "zhangsan@qq.com";
+	int pos = s_email.rfind('@');
+	string account_name = s_email.substr(0, pos);
+	cout << "用户名为：" << account_name <<endl;
+}
