@@ -12,7 +12,7 @@ person::person(string n, int a, string addr) {
 	*(this->address) = addr;
 	cout << (int)&addr << endl;
 	cout << (int)&(this->address) << endl;
-	cout << (int)&age << endl;
+	cout << (int)&age << endl;	
 	cout << (int)(this->address) << endl;
 }
 

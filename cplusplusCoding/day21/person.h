@@ -14,5 +14,5 @@ private:
 	string name;
 	int age;
 	string* address;
-};
 
+};
