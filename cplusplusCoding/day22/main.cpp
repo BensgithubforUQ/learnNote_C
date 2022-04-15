@@ -5,6 +5,7 @@
 #include <deque>
 #include <string>
 #include <vector>
+#include <time.h>
 /*一点简单的复习，包括虚函数，多态，封装，继承*/
 /*然后就是deque和vector的一些简单应用的复习*/
 void evaluate(Person* c, Person* j, double grade, Grade &g) {
@@ -40,16 +41,16 @@ int main() {
 	j_v.push_back(j3);
 	j_v.push_back(j4);
 	j_v.push_back(j5);
-	int g_1 = 1, g_2 = 1;
+	//随机数种子
+	srand((unsigned int)time(NULL));///重点
 	for (auto c : c_v) {
 		for (auto j : j_v) {
 			Grade g;
-			evaluate(c, j, g_2*g_1,g);
+			double grade_rand = (rand() % 99 + 1) + (rand() / double(RAND_MAX));//100以内的随机浮点数
+			evaluate(c, j, grade_rand,g);
 			c->grade.push_back(g);
 			j->grade.push_back(g);
-		    ++g_2;
 		}
-		++g_1;
 	}
 	for (auto c : c_v) {
 		c->showInfo();
