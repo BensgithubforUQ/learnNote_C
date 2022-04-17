@@ -39,30 +39,30 @@ bool comparePerson(Person &p1, Person &p2) {//这段真尼玛精华，草。
 }
 
 
-int main() {
-	//stack_test0();
-	//queue_test0();
-	//list_test0();
-	srand((unsigned int)time(NULL));
-	int size = 20;
-	Person* p_array = new Person[size];
-	list<Person> p_list;
-	for (int i = 0; i < size; i++) {
-		char name_temp = (i + 65);
-		string name{ name_temp };
-		int age = rand() % 25 + 20;
-		float height = (rand() % 30 + 160) + (rand() / double(RAND_MAX));
-		Person p_temp(name, age, height);
-		p_array[i] = p_temp;//数组版本
-		p_list.push_back(p_temp);//list版本
-	}
-	//p_array_show(p_array, 5);
-	p_array_show(p_list);
-	//排序
-	cout << "//排序:" << endl;
-	p_list.sort(comparePerson);
-	p_array_show(p_list);
-	delete[] p_array;//释放堆区内存
-	p_array = NULL;
-	return 0;
-}
+//int main() {
+//	//stack_test0();
+//	//queue_test0();
+//	//list_test0();
+//	srand((unsigned int)time(NULL));
+//	int size = 20;
+//	Person* p_array = new Person[size];
+//	list<Person> p_list;
+//	for (int i = 0; i < size; i++) {
+//		char name_temp = (i + 65);
+//		string name{ name_temp };
+//		int age = rand() % 25 + 20;
+//		float height = (rand() % 30 + 160) + (rand() / double(RAND_MAX));
+//		Person p_temp(name, age, height);
+//		p_array[i] = p_temp;//数组版本
+//		p_list.push_back(p_temp);//list版本
+//	}
+//	//p_array_show(p_array, 5);
+//	p_array_show(p_list);
+//	//排序
+//	cout << "//排序:" << endl;
+//	p_list.sort(comparePerson);
+//	p_array_show(p_list);
+//	delete[] p_array;//释放堆区内存
+//	p_array = NULL;
+//	return 0;
+//}

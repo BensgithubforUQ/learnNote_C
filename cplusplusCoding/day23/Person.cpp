@@ -4,7 +4,7 @@ Person::Person() {
 	cout << "calling default constructor" << endl;
 }
 
-Person::Person(string n,int a,double h) {
+Person::Person(string n, int a, double h) {
 	this->p_name = n;
 	this->p_age = a;
 	this->p_height = h;
@@ -16,7 +16,7 @@ Person::~Person() {
 }
 
 
-void Person::showInfo() {
+void Person::showInfo() const {
 	cout << "姓名 " << this->p_name << " 年龄 " << this->p_age << " 身高 " << this->p_height << endl;
 }
 
@@ -26,9 +26,9 @@ void Person::operator=(Person& p) {
 	this->p_height = p.p_height;
 }
 
-int Person::getAge() {
+int Person::getAge() const {
 	return this->p_age;
 }
-double Person::getheight() {
+double Person::getheight() const {
 	return this->p_height;
 }

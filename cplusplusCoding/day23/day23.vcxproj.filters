@@ -27,9 +27,18 @@
     <ClInclude Include="Person.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="set_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pair_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stack和queue和list容器.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="set容器和对组初识.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Person.cpp">

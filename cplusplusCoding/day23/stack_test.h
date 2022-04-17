@@ -28,8 +28,4 @@ void stack_test0() {
 		cout << "查看栈顶元素: " << s3.top() << endl; //查看栈顶元素
 		s3.pop(); //出栈操作
 	}
-	
-	
-
-	
 }

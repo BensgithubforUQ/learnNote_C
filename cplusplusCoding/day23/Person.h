@@ -8,10 +8,10 @@ public:
 	Person();
 	Person(string n, int a, double h);
 	~Person();
-	void showInfo();
+	void showInfo() const;
 	void operator=(Person& p);
-	int getAge();
-	double getheight();
+	int getAge() const;
+	double getheight() const;
 private:
 	string p_name;
 	int p_age;
