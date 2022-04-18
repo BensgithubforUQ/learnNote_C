@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="list_test.h" />
+    <ClInclude Include="map_test.h" />
     <ClInclude Include="pair_test.h" />
     <ClInclude Include="Person.h" />
     <ClInclude Include="queue_test.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="stack_test.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="map容器.cpp" />
     <ClCompile Include="Person.cpp" />
     <ClCompile Include="set容器和对组初识.cpp" />
     <ClCompile Include="stack和queue和list容器.cpp" />

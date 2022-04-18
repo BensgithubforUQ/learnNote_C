@@ -33,6 +33,9 @@
     <ClInclude Include="pair_test.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="map_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stack和queue和list容器.cpp">
@@ -42,6 +45,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Person.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="map容器.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
