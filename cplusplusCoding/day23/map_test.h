@@ -16,6 +16,16 @@ void printContainer(const map<int,T> &m) {
 	}
 	cout << endl;
 }
+
+template<typename T>
+void printContainer(const multimap<int, T>& m) {
+	for (typename multimap<int, T>::const_iterator it = m.begin(); it != m.end(); it++) {
+		cout << "key：" << (*it).first << " value:" << it->second << " ";
+	}
+	cout << endl;
+}
+
+
 void test_map0() {
 	map<int, int>m0;
 	m0.insert(pair<int, int>(1, 10));//pair<int, int>(1, 10)是一个匿名的pair类型
@@ -42,4 +52,77 @@ void test_map0() {
 	}
 	m1.swap(m0);//交换
 	printContainer(m0);
+}
+
+void test_map1() {
+	//insert的重载
+	map<int, int>m;
+	m.insert(pair<int, int>(1, 10));
+	m.insert(make_pair(3,30));
+	m.insert(map<int,int>::value_type(2,21));
+	m[4] = 40;//这个不推荐用，本质是创建key值为4，value为40的pair，容易出错。
+	cout << m[5] << endl;//这个m[5]实际上是创建一个key值为5,value为0的值。
+	printContainer(m);
+	//删除erase
+	m.erase(m.begin());
+	printContainer(m);
+	m.erase(2);//按照key值删除
+	printContainer(m);
+	m.erase(m.begin(), --m.end());//按照区间的模式删除
+	printContainer(m);
+	//clear
+	m.clear();
+	if (!m.empty()) {
+		printContainer(m);
+	}
+	else {
+		cout << "blank container" << endl;
+	}
+	
+}
+
+void test_map2() {
+	//find,按照key查询
+	//count，按照key统计
+	multimap<int, int>m;
+	m.insert(pair<int, int>(1, 10));
+	m.insert(pair<int, int>(1, 10));
+	m.insert(pair<int, int>(1, 10));
+	m.insert(make_pair(3, 30));
+	m.insert(multimap<int, int>::value_type(2, 21));
+	//m[4] = 40;//这个不推荐用，本质是创建key值为4，value为40的pair，容易出错。
+
+	map<int, int>::iterator target = m.find(1);
+	if (target != m.end()) {
+		cout << "找到了: " << target->first << " " << target->second << endl;
+		cout << "一共有： " << m.count(1) << endl;
+	}
+	else {
+		cout << "没找到" << endl;
+	}
+
+}
+class myCompare {
+public:
+	bool operator()(int p1,int p2) const{
+		return p1 > p2;
+	}
+};
+
+template<typename T>
+void printContainer( map<int, T, myCompare>& m) {
+	for (typename map<int, T, myCompare>::iterator it = m.begin(); it != m.end(); it++) {
+		cout << "key：" << (*it).first << " value:" << it->second << " ";
+	}
+	cout << endl;
+}
+
+void test_map3() {
+	map<int, int, myCompare>m;
+	m.insert(pair<int, int>(1, 10));
+	m.insert(make_pair(3, 30));
+	m.insert(map<int, int>::value_type(2, 21));
+	m[4] = 40;//这个不推荐用，本质是创建key值为4，value为40的pair，容易出错。
+	cout << m[5] << endl;//这个m[5]实际上是创建一个key值为5,value为0的值。
+	printContainer(m);
 }
