@@ -8,8 +8,10 @@
 #include "fourKindSorting.h"
 #include "fourKindCopying.h"
 #include "arithmetic_generate.h"
+#include "set_algorithm.h"
 
 int main() {
+	srand((unsigned int)time(NULL));//写在main里面才有效
 	//test_for_each0();
 	//transform_test0();
 
@@ -37,7 +39,11 @@ int main() {
 	//replace_if_test0();
 	//swap_test0();
 
-	accumulate_test();
-	fill_test();
+	/*accumulate_test();
+	fill_test();*/
+
+	//set_intersection_test(); 
+	//set_union_test();
+	set_difference_test();
 	return 0;
 }

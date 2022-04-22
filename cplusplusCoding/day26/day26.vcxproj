@@ -150,6 +150,7 @@
     <ClInclude Include="for_each.h" />
     <ClInclude Include="fourKindCopying.h" />
     <ClInclude Include="fourKindSorting.h" />
+    <ClInclude Include="set_algorithm.h" />
     <ClInclude Include="transform.h" />
     <ClInclude Include="vector_base.h" />
   </ItemGroup>

@@ -7,7 +7,7 @@
 using namespace std;
 
 void constructVectorWithSize(vector<int> &v,int size) {//初始化一个有size个元素的vector容器
-	srand((unsigned int)time(NULL));
+	//srand((unsigned int)time(NULL));
 	if (v.empty() && size != 0) {
 		for (int i = 0; i < size; i++) {
 			v.push_back(rand() % 10 + 1);
