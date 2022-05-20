@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "head.h"
 
-int main()
+int main() //g++ main.c -o app -I ./include/ -l calc -L ./lib //compile command
 {
 //     Linux : libxxx.a
 // lib : 前缀（固定）
