@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include "head.h"
 
 int main() //g++ main.c -o app -I ./include/ -l calc -L ./lib //compile command
