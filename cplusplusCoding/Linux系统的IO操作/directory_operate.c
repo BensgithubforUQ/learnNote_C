@@ -15,7 +15,7 @@ int main(){
         perror("rename");
         //return -1;
     }
-    char buf[128];
+    char buf[128]; //buf是个传出参数,指针传参，实参。
     getcwd(buf,sizeof(buf)); //修改进程的工作目录
     //比如在本目录上启动程序，则进程工作目录就在本目录
     //可以通过这个函数换到其他目录
@@ -32,7 +32,7 @@ int main(){
         perror("open");
         return -1;
     }
-    getcwd(buf,sizeof(buf));
+    getcwd(buf,sizeof(buf)); 
     printf("当前的工作目录是：%s\n",buf);
     return 0;
 }
