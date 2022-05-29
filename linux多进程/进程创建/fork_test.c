@@ -20,13 +20,17 @@
      }
      if(pid == 0){
          //等于0，则是子进程
-         num += 100;
+         sleep(1); //orphan进程，这里加个sleep就会出现父进程结束子进程未结束的情况
+         //这时候子进程的父进程就会被内核设置为inti，ppid = 1
+         //然后，因为这时候子进程的内核去的文件操作符还和原来的父进程是一样的
+         //因此还是在原来的终端中进行文件IO操作。
+         //这也是彰显了孤儿进程和原父进程的关系吧，大概。
+         num += 100; 
          printf("this is a child process,pid: %d, ppid: %d, num = %d\n",getpid(),getppid(), num);
      }
      for(int i =0;i<5;i++){
          ++num;
          printf("i: %d,pid : %d, num: %d\n",i,getpid(),num);//可以发现进程交错运行。
-         sleep(1);
      }
      return 0;
  }
