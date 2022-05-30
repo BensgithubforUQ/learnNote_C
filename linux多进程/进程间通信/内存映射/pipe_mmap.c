@@ -55,5 +55,6 @@ int main()
         printf("子进程,pid: %d, ppid : %d\n",getpid(),getppid());
         strcpy((char *)ptr, "hellow, child\n");
     }
+    munmap(NULL,size);
     return 0;
 }
