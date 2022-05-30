@@ -45,7 +45,8 @@ int main()
 
         printf("kill child process\n");
 
-        kill(pid, 2);
+        kill(pid, 2); //怎么我的好像不认sigint啊。。。
+
     }
     return 0;
 }
