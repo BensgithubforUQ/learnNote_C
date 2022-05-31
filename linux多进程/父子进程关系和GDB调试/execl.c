@@ -21,6 +21,14 @@ int main(){
        }
        else if(s_pid == 0){
            execlp("ps","ps","aux",NULL); //从环境变量中查找文件，找到就运行
+           /*
+           int execv(const char *path, char *const argv[]);
+           argv是需要的参数的一个字符串数字
+           char * argv[] = {"ps","aux",NULL};
+           execv("/bin/ps",argv);
+
+           
+           */
            printf("测试是否能打印2？");
        }
        

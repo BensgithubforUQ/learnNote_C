@@ -14,7 +14,12 @@
      if(pid>0){
          //pid大于0,就是父进程，返回的是子进程的id
          printf("pid : %d \n",pid);
-         while(1){
+         while(1){ //产生僵尸进程，是有害的
+         //父进程死循环，进程终止的时候，父进程没有回收
+         //子进程残留的资源PCB存放在内核中，变成了僵尸进程
+         //僵尸进程无法被kill -9杀死
+         //如果父进程不调用wait或者waitpid的话就不会释放保留的那段信息，进程号就会一直被占用。
+         //但是系统的进程号是有限的，如果产生大量进程就很有危害。
              num += 10;
              printf("this is a parent process,pid: %d, ppid: %d, num = %d\n",getpid(),getppid(), num);
              sleep(1);

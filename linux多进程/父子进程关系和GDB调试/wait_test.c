@@ -22,7 +22,6 @@ int main(){
        while(1){
            printf("parent process, pid:%d\n",getpid());
            int ret = wait(NULL);//加宏函数可以返回不同的值。
-           
            printf("child killed，pid = %d\n",ret);
            sleep(1);
        }
