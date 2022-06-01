@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <semaphore.h>
 //用链表当容器，不考虑存满，可以无限储存。
 struct Product
 {
@@ -16,7 +17,7 @@ struct Product
 //造锁
 pthread_mutex_t mutex;
 //创建条件变量
-pthread_cond_t cond;
+sem_t pro, cus;
 struct Product *head = NULL;
 // 进化版的互斥锁（1 --> N）
 
@@ -30,15 +31,15 @@ void *produce(void *arg)
 {
     while (1)
     {
+        sem_wait(&pro);             //调用一次，pro的值-1，默认一开始为8
         pthread_mutex_lock(&mutex); //锁住
         struct Product *newProduct = (struct Product *)malloc(sizeof(struct Product));
         newProduct->next = head;
         head = newProduct;
         newProduct->num = rand() % 100;
         printf("add node, num :%d, tid: %ld\n", newProduct->num, pthread_self());
-        //生产一个就通知，产生一个信号
-        pthread_cond_signal(&cond);
         pthread_mutex_unlock(&mutex); //解锁
+        sem_post(&cus);//cus++
         usleep(1000);
     }
     return NULL;
@@ -48,26 +49,17 @@ void *consum(void *arg)
 {
     while (1)
     {
-        pthread_mutex_lock(&mutex);  //锁住
+        sem_wait(&cus);//如果不为0，就可以放过去了，因此不需要判断是否为空
+        pthread_mutex_lock(&mutex); //锁住
         usleep(1000);
         struct Product *temp = head; //保存头结点的指针
-        if (head != NULL)
-        {
-            //链表不为空
-            head = head->next; //往后移
-            printf("del node, num :%d, tid: %ld\n", temp->num, pthread_self());
-            free(temp);
-            pthread_mutex_unlock(&mutex); //解锁
-            usleep(1000);
-        }
-        else
-        {
-            //链表为空
-            //等到有数据再消费
-            pthread_cond_wait(&cond,&mutex);//阻塞在这
-
-            pthread_mutex_unlock(&mutex); //解锁
-        }
+        //链表不为空
+        head = head->next; //往后移
+        printf("del node, num :%d, tid: %ld\n", temp->num, pthread_self());
+        free(temp);
+        pthread_mutex_unlock(&mutex); //解锁
+        sem_post(&pro);//给生产者加空位，pro++
+        usleep(1000);
     }
     return NULL;
 }
@@ -75,7 +67,8 @@ void *consum(void *arg)
 int main()
 {
     pthread_mutex_init(&mutex, NULL); //初始化锁
-    pthread_cond_init(&cond,NULL);//初始化条件变量
+    sem_init(&pro, 0, 8);             //初始化信号量
+    sem_init(&cus, 0, 0);
     //创建五个生产者线程和五个消费者线程
     pthread_t ptid[5], ctid[5];
     for (int i = 0; i < 5; i++)
@@ -87,15 +80,14 @@ int main()
     //线程分离
     for (int i = 0; i < 5; i++)
     {
-        pthread_join(&ctid[i],NULL);
-        pthread_join(&ptid[i],NULL);
+        pthread_join(&ctid[i], NULL);
+        pthread_join(&ptid[i], NULL);
     }
-    while(1){
+    while (1)
+    {
+    }
 
-    }
-    
     pthread_mutex_destroy(&mutex); //销毁锁
-    pthread_cond_destroy(&cond);//释放条件变量
     pthread_exit(NULL);
     return 0;
 }
