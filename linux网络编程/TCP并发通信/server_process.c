@@ -5,9 +5,35 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <wait.h>
+#include <errno.h>
+
+void recyleChild(int arg){
+    while(1){
+        int ret = waitpid(-1,NULL,WNOHANG);
+        if(ret == -1){
+            break; //回收完毕
+        }
+        else if (ret == -1)
+        {
+            /* code */
+            break;//还有子进程活着
+        }
+        else if(ret > 0){
+            printf("子进程 %d被回收了\n",ret);
+        }
+    }
+}
 
 int main()
 {
+    struct sigaction act;
+    act.sa_flags = 0;
+    sigemptyset(&act.sa_mask);
+    act.sa_handler = recyleChild;
+    //注册信号
+    sigaction(SIGCHLD,&act,NULL);
     // set socket
     int l_fd = socket(AF_INET, SOCK_STREAM, 0);
     // struct
@@ -29,8 +55,16 @@ int main()
         struct sockaddr_in c_addr;
         int len = sizeof(c_addr);
         int c_fd = accept(l_fd, (struct sockaddr *)&c_addr, &len);
+        if(c_fd == -1){
+            if(errno == EINTR){
+                continue;
+            }
+            perror("accept");
+            exit(-1);
+        }
         // connect with each client process TCP
         pid_t pid = fork();
+        //通过信号捕捉回收子进程的资源
         if (pid == 0)
         {
             // get clients' info
@@ -47,7 +81,7 @@ int main()
                     printf("recieved data is : %s \n",recBuf);  
                 } //简易写法，不考虑断开连接和连接失败
 
-                write(c_fd,&recBuf,strlen(recBuf));
+                write(c_fd,&recBuf,strlen(recBuf)+1);
             }
             close(c_fd);
             exit(0);

@@ -28,9 +28,8 @@ int main()
         
        
         sprintf(data_to_server,"data : %d\n",i++);
-        write(fd_sock, data_to_server, strlen(data_to_server));
+        write(fd_sock, data_to_server, strlen(data_to_server)+1);
         i++;
-        num--;
         sleep(1);
         char server_buf[1024] = {0};
         int ret_read = read(fd_sock, server_buf, sizeof(server_buf));
