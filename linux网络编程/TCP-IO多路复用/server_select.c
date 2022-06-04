@@ -21,7 +21,7 @@ int main()
     //绑定（ip和port）
     struct sockaddr_in sockAddr;
     sockAddr.sin_family = AF_INET;
-    int ip_addr = inet_pton(AF_INET, "127.0.0.1", &sockAddr.sin_addr.s_addr);
+    int ip_addr = inet_pton(AF_INET, "192.168.19.128", &sockAddr.sin_addr.s_addr);
     // sockAddr.sin_addr.s_addr = 0;//0.0.0.0,可以偷懒这么写
     sockAddr.sin_port = htons(9999);
     int ret_bind = bind(listen_fd, (struct sockaddr *)&sockAddr, sizeof(sockAddr));

@@ -12,7 +12,7 @@ int main()
     int fd_sock = socket(AF_INET, SOCK_STREAM, 0);
     //连接服务器端
     struct sockaddr_in server_addr;
-    inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr.s_addr);
+    inet_pton(AF_INET, "192.168.19.128", &server_addr.sin_addr.s_addr);
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(9999);
     int ret_conn = connect(fd_sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
