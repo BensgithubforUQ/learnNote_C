@@ -1,7 +1,29 @@
 # learnNote
 
-This a learning note for reviewing c++ basic languages.
+一、语言本身
+变量、条件、循环、字符串、数组、函数、结构体······
+C语言重点：指针、内存管理
+C++要学：面向对象特性、泛型、模板、STL
 
-day 1 - day 26: from the most basic grammars to lightly advanced STL usages.
+二、基础四大件
+1.数据结构和算法：
+数据结构：字符串、链表、二叉树、堆、栈、队列、哈希······
+算法：查找、排序、动态规划······
 
-day 26 - day ? : Redis and MySql.
+2.计算机网络
+TCP/IP协议栈：ARP协议、IP协议、ICMP协议、TCP协议、UDP协议、DNS协议、HTTP协议、HTTPS协议
+
+3.操作系统
+进程和线程：原子性、并发、锁······
+内存：内存分布、内存调度······
+
+4.设计模式
+单例、工厂、代理、策略、模板方法
+
+三、应用与编程实践
+1.Linux操作系统：系统命令、基本shell编程
+2.编译/调试工具：GCC编译器、写makefile、GDB调试器
+3.Linux系统编程
+(1).Linux API
+(2).多线程编程(实践)：线程、资源、信号、同步、互斥、锁······
+(3).网络编程：Linux网络编程API、IO函数······
