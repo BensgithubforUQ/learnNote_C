@@ -14,6 +14,10 @@
 
 #define MAX_FD 65536           // 最大的文件描述符个数
 #define MAX_EVENT_NUMBER 10000 // 监听的最大的事件数量
+//设置定时器相关参数
+static int pipefd[2];
+static sort_timer_lst timer_lst;
+static int epollfd = 0;
 
 //向epoll例程中添加文件描述符
 extern void addfd(int epollfd, int fd, bool one_shot);
@@ -29,7 +33,17 @@ void addsig(int sig, void(handler)(int))
     sigfillset(&sa.sa_mask);                 //临时阻塞信号集，信号捕捉函数执行过程中，临时阻塞某些信号
     assert(sigaction(sig, &sa, NULL) != -1); //断言函数，用于在调试过程中捕捉程序的错误。
 }
-
+//信号处理函数
+void sig_handler(int sig){
+    //为了保证函数的可重入性，需要保留原来的errno
+    //可重入性的意思是，中断后可以再次进入该函数，环境变量和之前相同，不会中断数据
+    int save_errno = errno;
+    int msg = sig;
+    //将信号值从管道端写入，传输字符类型，而非整形
+    send(pipefd[1],(char *)&msg,1,0);
+    //将原来的errno赋值为当前的errno
+    errno = save_errno;
+}
 int main(int argc, char *argv[])
 {
 
