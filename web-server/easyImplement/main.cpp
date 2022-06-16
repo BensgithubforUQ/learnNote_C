@@ -11,6 +11,7 @@
 #include "locker.h"
 #include "threadpool.h"
 #include "http_conn.h"
+#include "lst_timer.h"
 
 #define MAX_FD 65536           // 最大的文件描述符个数
 #define MAX_EVENT_NUMBER 10000 // 监听的最大的事件数量
@@ -44,6 +45,56 @@ void sig_handler(int sig){
     //将原来的errno赋值为当前的errno
     errno = save_errno;
 }
+
+//定时器回调函数，删除非活动连接在socket上的注册事件，并关闭
+void cb_func(client_data *user_data){
+    //删除非活动连接在socket上的注册事件
+    epoll_ctl(epollfd,EPOLL_CTL_DEL,user_data->sockfd,0);
+    //C++中assert，即断言，可以在程序调试阶段检查错误
+    //常用的就比如函数传参时，若是整型，是否超出范围；若是字符串型，地址是否为空等。
+    assert(user_data);
+
+    //
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main(int argc, char *argv[])
 {
 
