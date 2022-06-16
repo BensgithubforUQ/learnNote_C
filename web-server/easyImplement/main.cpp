@@ -17,9 +17,9 @@
 #define MAX_EVENT_NUMBER 10000 // 监听的最大的事件数量
 #define TIMESLOT 5             //最小超时单位
 //设置定时器相关参数
-static int pipefd[2]; //创建管道通信用
-static sort_timer_lst timer_lst;//定时器链表
-static int epollfd = 0; //
+static int pipefd[2];            //创建管道通信用
+static sort_timer_lst timer_lst; //定时器链表
+static int epollfd = 0;          //
 
 //向epoll例程中添加文件描述符
 extern void addfd(int epollfd, int fd, bool one_shot);
@@ -27,81 +27,49 @@ extern void addfd(int epollfd, int fd, bool one_shot);
 extern void removefd(int epollfd, int fd);
 
 //设置信号函数
-void addsig(int sig, void(handler)(int),bool restart = true)
-{                                            // void( handler )(int)是函数指针，是sa被捕捉到之后执行的处理函数
-    struct sigaction sa;                     // sigaction结构体
-    memset(&sa, '\0', sizeof(sa));           //初始化
-    sa.sa_handler = handler;                 //处理函数
-    if(restart)
+void addsig(int sig, void(handler)(int), bool restart = true)
+{                                  // void( handler )(int)是函数指针，是sa被捕捉到之后执行的处理函数
+    struct sigaction sa;           // sigaction结构体
+    memset(&sa, '\0', sizeof(sa)); //初始化
+    sa.sa_handler = handler;       //处理函数
+    if (restart)
         sa.sa_flags |= SA_RESTART;
     sigfillset(&sa.sa_mask);                 //临时阻塞信号集，信号捕捉函数执行过程中，临时阻塞某些信号
     assert(sigaction(sig, &sa, NULL) != -1); //断言函数，用于在调试过程中捕捉程序的错误。
 }
 
-
-
 //信号处理函数
-void sig_handler(int sig){
+void sig_handler(int sig)
+{
     //为了保证函数的可重入性，需要保留原来的errno
     //可重入性的意思是，中断后可以再次进入该函数，环境变量和之前相同，不会中断数据
     int save_errno = errno;
     int msg = sig;
     //将信号值从管道端写入，传输字符类型，而非整形
-    send(pipefd[1],(char *)&msg,1,0);
+    send(pipefd[1], (char *)&msg, 1, 0);
     //将原来的errno赋值为当前的errno
     errno = save_errno;
 }
 
 //定时器回调函数，删除非活动连接在socket上的注册事件，并关闭
-void cb_func(client_data *user_data){
+void cb_func(client_data *user_data)
+{
     //删除非活动连接在socket上的注册事件
-    epoll_ctl(epollfd,EPOLL_CTL_DEL,user_data->sockfd,0);
-    //C++中assert，即断言，可以在程序调试阶段检查错误
+    epoll_ctl(epollfd, EPOLL_CTL_DEL, user_data->sockfd, 0);
+    // C++中assert，即断言，可以在程序调试阶段检查错误
     //常用的就比如函数传参时，若是整型，是否超出范围；若是字符串型，地址是否为空等。
     assert(user_data);
-    //close fd
+    // close fd
     close(user_data->sockfd);
     //减少连接数
     http_conn::m_user_count--;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void time_handler()
+{ //定时处理任务，重新定时以不断触发SIGALRM信号
+    timer_lst.tick();
+    alarm(TIMESLOT);
+}
 
 int main(int argc, char *argv[])
 {
@@ -113,14 +81,13 @@ int main(int argc, char *argv[])
     }
 
     int port = atoi(argv[1]);
-    addsig(SIGPIPE, SIG_IGN);//如果捕捉到sigpipe，忽略
+    addsig(SIGPIPE, SIG_IGN); //如果捕捉到sigpipe，忽略
     //当一个进程向某个已收到RST的套接字执行写操作时，内核向该进程发送SIGPIPE信号。
     //当服务器close一个连接时，若client端接着发数据。
     //根据TCP协议的规定，会收到一个RST响应，client再往这个服务器发送数据时，
     //系统会发出一个SIGPIPE信号给进程，告诉进程这个连接已经断开了，不要再写了。
     //根据信号的默认处理规则SIGPIPE信号的默认执行动作是terminate(终止、退出),
     //所以client会退出。若不想客户端退出可以把SIGPIPE设为SIG_IGN
-
 
     threadpool<http_conn> *pool = NULL; //定义线程池并且，初始化
     try
@@ -160,25 +127,27 @@ int main(int argc, char *argv[])
     // 否则阻塞直到超时
     // 得到就绪状态后进行真正的操作可以在同一个线程里执行，也可以启动线程执行（线程池）
     // 本质上是没有阻塞的
-    epoll_event events[MAX_EVENT_NUMBER]; //epoll
-    int epollfd = epoll_create(5); //文件描述符保存空间 epoll例程
+    epoll_event events[MAX_EVENT_NUMBER]; // epoll
+    int epollfd = epoll_create(5);        //文件描述符保存空间 epoll例程
     // 添加到epoll对象中
     addfd(epollfd, listenfd, false); //将监听套接字注册到epoll例程中
 
     //将上述epollfd赋值给http类对象的m_epollfd属性
-    http_conn::m_epollfd = epollfd; 
+    http_conn::m_epollfd = epollfd;
 
     //创建管道套接字
-    ret = socketpair(PF_INET,SOCK_STREAM,0,pipefd);//返回结果， 0为创建成功，-1为创建失败
+    ret = socketpair(PF_INET, SOCK_STREAM, 0, pipefd); //返回结果， 0为创建成功，-1为创建失败
     assert(ret != -1);
 
     //设置管道写端为非阻塞，为什么写端要非阻塞？
     setnonblocking(pipefd[1]);
     //设置管道读端为ET非阻塞
-    addfd(epollfd,pipefd[0],false);
+    addfd(epollfd, pipefd[0], false);
     //传递给主循环的信号值，这里只关注sigalarm和sigterm
-    addsig(SIGALRM,sig_handler,false);
-    addsig(SIGTERM,sig_handler,false);
+    addsig(SIGALRM, sig_handler, false);
+    addsig(SIGTERM, sig_handler, false);
+    //创建一个连接资源的数组
+    client_data *user_timer = new client_data[MAX_FD];
     //循环条件
     bool stop_server = false;
     //超时标志
@@ -190,34 +159,95 @@ int main(int argc, char *argv[])
 
         int number = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1); //返回触发事件的文件描述符的集合的数量
 
-        //events中保存触发事件的文件描述符的集合
+        // events中保存触发事件的文件描述符的集合
         if ((number < 0) && (errno != EINTR))
         {
             printf("epoll failure\n");
             break;
         }
+
         //查询发生事件的文件描述符表
         for (int i = 0; i < number; i++)
         {
-            int sockfd = events[i].data.fd;//取出集合中的文件描述符
+            int sockfd = events[i].data.fd; //取出集合中的文件描述符
 
-            //管道读端对应的文件描述符发生读事件
-            if((sockfd == pipefd[0]) && (events[i].events & EPOLLIN)){
+            if (sockfd == listenfd) //如果是监听套接字，那说明有新的连接
+            {
+                struct sockaddr_in client_address;
+                socklen_t client_addrlength = sizeof(client_address);
+                //接受新的连接
+                // LT水平触发
+                int connfd = accept(listenfd, (struct sockaddr *)&client_address, &client_addrlength);
+
+                // if (connfd < 0) //没有连接
+                // {
+                //     printf("errno is: %d\n", errno);
+                //     continue;
+                // }
+                // if (http_conn::m_user_count >= MAX_FD) //超出上限
+                // {
+                //     close(connfd);
+                //     continue;
+                // }
+                // users[connfd].init(connfd, client_address); //正常连接，初始化新接受的连接
+
+                //初始化该连接对应的连接资源
+                user_timer[connfd].address = client_address;
+                user_timer[connfd].sockfd = connfd;
+
+                //创建定时器临时变量
+                util_timer *timer = new util_timer;
+                //设置定时器对应的连接资源
+                timer->user_data = &user_timer[connfd];
+                //设置回调函数
+                timer->cb_func = cb_func;
+                //当前时间
+                time_t cur = time(NULL);
+                //设置绝对超时时间
+                timer->expire = cur + 3 * TIMESLOT;
+                //创建连接对应的定时器，初始化临时变量
+                user_timer[connfd].timer = timer;
+                //把这个定时器添加到定时器链表里面去
+                timer_lst.add_timer(timer);
+            }
+            else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
+            {
+                // events->data.fd; 文件描述符
+                // events->events; 文件描述符的事件类型
+                // EPOLLRDHUP 断开连接或者半关闭
+                // EPOLLHUP 当socket的一端认为对方发来了一个不存在的4元组请求的时候,会回复一个RST响应
+                // EPOLLERR 发生错误
+                //服务器关闭了连接，移除对应的定时器
+                cb_func(&user_timer[sockfd]);
+
+                util_timer *timer = user_timer[sockfd].timer;
+                if (timer)
+                {
+                    timer_lst.del_timer(timer);
+                }
+                // users[sockfd].close_conn(); //关闭连接
+            }
+            else if ((sockfd == pipefd[0]) && (events[i].events & EPOLLIN))
+            { //管道读端对应的文件描述符发生读事件
                 //是管道读端 且 存在读事件
                 int sig;
                 char signals[1024];
                 //从管道读端读出信号值，成功返回字节数，失败返回-1
                 //正常情况下，这里的ret返回值总是1，只有14和15两个ASCII码对应的字符
-                ret = recv(pipefd[0],signals,sizeof(signals),0);
-                if(ret == -1){
+                ret = recv(pipefd[0], signals, sizeof(signals), 0);
+                if (ret == -1)
+                {
                     continue;
                 }
-                else if(ret == 0){
+                else if (ret == 0)
+                {
                     continue;
                 }
-                else{
+                else
+                {
                     //处理信号值对应的逻辑
-                    for(int i = 0;i<ret;++i){
+                    for (int i = 0; i < ret; ++i)
+                    {
                         switch (signals[i])
                         {
                         case SIGALRM: //由alarm系统调用产生timer时钟信号
@@ -232,59 +262,64 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-
             }
-
-
-            if (sockfd == listenfd) //如果是监听套接字，那说明有新的连接
+            else if (events[i].events & EPOLLIN) //处理客户连接上接收到的数据
             {
-                struct sockaddr_in client_address; 
-                socklen_t client_addrlength = sizeof(client_address);
-                //接受新的连接 
-                //LT水平触发
-                int connfd = accept(listenfd, (struct sockaddr *)&client_address, &client_addrlength);
-                if (connfd < 0) //没有连接
+                //创建定时器临时变量，将该连接对应的定时器取出来
+                util_timer *timer = user_timer[sockfd].timer;
+                
+                if (users[sockfd].read())//情况1
                 {
-                    printf("errno is: %d\n", errno);
-                    continue;
-                }
-                if (http_conn::m_user_count >= MAX_FD) //超出上限
-                {
-                    close(connfd);
-                    continue;
-                }
-                users[connfd].init(connfd, client_address); //正常连接，初始化新接受的连接
-            }
-            else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
-            {
-                // events->data.fd; 文件描述符
-                // events->events; 文件描述符的事件类型
-                // EPOLLRDHUP 断开连接或者半关闭
-                // EPOLLHUP 当socket的一端认为对方发来了一个不存在的4元组请求的时候,会回复一个RST响应
-                // EPOLLERR 发生错误
-                users[sockfd].close_conn(); //关闭连接
-            }
-            else if (events[i].events & EPOLLIN)//读取数据
-            {
-                if (users[sockfd].read())
-                {
-                    pool->append(users + sockfd);//如果检测到读事件，将这个事件放到请求队列
+                    pool->append(users + sockfd); //如果检测到读事件，将这个事件放到请求队列
                     // 浏览器端发出http连接请求，服务器端主线程创建http对象接收请求并将所有数据读入对应buffer，
                     // 将该对象插入任务队列后，工作线程从任务队列中取出一个任务进行处理。
+                    if(timer){
+                        time_t cur = time(NULL);
+                        //如果有事件，有数据在传递，则需要延长连接时间
+                        timer->expire = cur + 3 *TIMESLOT;
+                        timer_lst.adjust_timer(timer);
+                    }
                 }
-                else
+                else//情况2
                 {
-                    users[sockfd].close_conn();
+                    //users[sockfd].close_conn();
+                    //服务器端关闭连接，移除对应的定时器
+                    cb_func(&user_timer[sockfd]);
+                    if(timer){
+                        timer_lst.del_timer(timer);
+                    }
                 }
             }
-            else if (events[i].events & EPOLLOUT)//输出缓存为空，立即发送数据
+            else if (events[i].events & EPOLLOUT) //输出缓存为空，立即发送数据
             {
-
+                util_timer *timer = user_timer[sockfd].timer;
                 if (!users[sockfd].write())
                 {
-                    users[sockfd].close_conn();
+                    //users[sockfd].close_conn();
+                    //服务器端关闭连接，移除对应的定时器
+                    cb_func(&user_timer[sockfd]);
+                    if(timer){
+                        timer_lst.del_timer(timer);
+                    }
+
+                }
+                else{
+                    //若有数据传输，则将定时器往后延迟3个单位
+                    //并对新的定时器在链表上的位置进行调整
+                    if(timer){
+                        time_t cur = time(NULL);
+                        //如果有事件，有数据在传递，则需要延长连接时间
+                        timer->expire = cur + 3 *TIMESLOT;
+                        timer_lst.adjust_timer(timer);
+                    }
                 }
             }
+        }
+        if(timeout){
+            //处理定时器为非必须事件，收到信号并不是立马处理
+            //完成读写事件后，再进行处理
+            time_handler();
+            timeout = true;
         }
     }
 
@@ -294,3 +329,14 @@ int main(int argc, char *argv[])
     delete pool;
     return 0;
 }
+
+// 服务器首先创建定时器容器链表，然后用统一事件源将异常事件，读写事件和信号事件统一处理，根据不同事件的对应逻辑使用定时器。
+// 浏览器与服务器连接时，创建该连接对应的定时器，并将该定时器添加到链表上
+
+// 处理异常事件时，执行定时事件，服务器关闭连接，从链表上移除对应定时器
+
+// 处理定时信号时，将定时标志设置为true
+
+// 处理读事件时，若某连接上发生读事件，将对应定时器向后移动，否则，执行定时事件
+
+// 处理写事件时，若服务器通过某连接给浏览器发送数据，将对应定时器向后移动，否则，执行定时事件
