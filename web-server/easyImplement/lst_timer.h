@@ -59,6 +59,7 @@ public:
             delete tmp;
             tmp = head;
         }
+    }
     
     //功能函数
     //添加定时器
@@ -72,9 +73,116 @@ public:
         }
         //如果新的定时器超时时间小于当前头部结点
         //直接将当前定时器结点作为头部结点
-        if(timer.)
-    }
+        if(timer->expire < head->expire){
+            timer->next = head;
+            head->prev = timer;
+            head = timer;
+            return;
+        }
+        //否则，就调用私有成员函数，调整内部结点
+        inner_timer(timer,head);
     }
 
+    //功能函数，调整定时器，当任务发生变化的时候，调整定时器在链表中的位置
+    void adjust_timer(util_timer *timer){
+        if(!timer){
+            return;
+        }
+        util_timer* temp = timer->next;
+
+        //结点为尾结点，或者，结点调整之后的expire还是小于下一个结点的expire,都不作调整
+        if(!temp || (timer->expire<temp->expire)){
+            return;
+        }
+        //如果结点为头结点，则需要把该结点取出来，重新插入到合适的位置
+        if(timer == head){
+            head = head->next;
+            head->prev = NULL;
+            timer->next = NULL;
+            inner_timer(timer,head);
+        }
+        //如果改结点是链表中间的结点，则也需要取出来重新插入到合适的位置
+        else{
+            timer->prev->next = timer->next;
+            timer->next->prev = timer->prev;
+            inner_timer(timer,timer->next);
+        }
+    }
+
+    //功能函数，删除定时器
+    void del_timer(util_timer *timer){
+        if(!timer){
+            return;
+        }
+        //如果链表中只有一个定时器，需要删除该定时器
+        if((head == timer)&&(tail == timer)){
+            delete timer;
+            head = NULL;
+            tail = NULL;
+            return;
+        }
+        //如果需要删除的结点是头结点
+        if(head==timer){
+            head = head->next;
+            head->prev = NULL;
+            delete timer;
+            return;
+        }
+        //尾结点的情况
+        if(tail==timer){
+            tail = tail->prev;
+            tail->next = NULL;
+            delete timer;
+            return;
+        }
+        //被删除的结点在链表内部（排除了以上情况）
+        timer->prev->next = timer->next;
+        timer->next->prev = timer->prev;
+        delete timer;
+    }
+
+    //还有一个核心函数,定时任务处理函数
+    void tick(){
+        if(!head) return;
+        //获取当前时间
+        time_t  cur = time(NULL);
+        util_timer *tmp = head;
+        //遍历链表
+        while(tmp){
+            //升序链表，当前tmp的expire未超时，则后面的也没超时
+            if(cur<tmp->expire){
+                break;
+            }
+            //tmp的超时了，需要使用回调函数，执行定时事件，在本项目中，为终端客户端和服务器连接
+            tmp->cb_func(tmp->user_data);
+            //然后删掉这个tmp
+            head = tmp->next;
+            if(head){
+                head->prev = NULL;
+            }
+            delete tmp;//回收一下
+            tmp = head;
+        }
+    }
+
+private:
+    //私有函数，重载add_timer,用于调整链表内部结点
+    void inner_timer(util_timer *timer,util_timer *start_pos){
+        util_timer *prev = start_pos;
+        util_timer *tmp = prev->next;
+        //从tmp的下一个开始遍历，插入timer
+        while(tmp){
+            if(timer->expire<tmp->expire){
+                prev->next = timer;
+                timer->next = tmp;
+                tmp->prev = timer;
+                timer->prev = prev;
+                break;
+            }
+            //继续往后找
+            prev = tmp;
+            tmp = tmp->prev;
+        }
+    }
 };
 #endif

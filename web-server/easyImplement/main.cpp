@@ -15,25 +15,31 @@
 
 #define MAX_FD 65536           // 最大的文件描述符个数
 #define MAX_EVENT_NUMBER 10000 // 监听的最大的事件数量
+#define TIMESLOT 5             //最小超时单位
 //设置定时器相关参数
-static int pipefd[2];
-static sort_timer_lst timer_lst;
-static int epollfd = 0;
+static int pipefd[2]; //创建管道通信用
+static sort_timer_lst timer_lst;//定时器链表
+static int epollfd = 0; //
 
 //向epoll例程中添加文件描述符
 extern void addfd(int epollfd, int fd, bool one_shot);
 //从epoll例程中删除文件描述符
 extern void removefd(int epollfd, int fd);
 
-//设置信号捕捉
-void addsig(int sig, void(handler)(int))
+//设置信号函数
+void addsig(int sig, void(handler)(int),bool restart = true)
 {                                            // void( handler )(int)是函数指针，是sa被捕捉到之后执行的处理函数
     struct sigaction sa;                     // sigaction结构体
     memset(&sa, '\0', sizeof(sa));           //初始化
     sa.sa_handler = handler;                 //处理函数
+    if(restart)
+        sa.sa_flags |= SA_RESTART;
     sigfillset(&sa.sa_mask);                 //临时阻塞信号集，信号捕捉函数执行过程中，临时阻塞某些信号
     assert(sigaction(sig, &sa, NULL) != -1); //断言函数，用于在调试过程中捕捉程序的错误。
 }
+
+
+
 //信号处理函数
 void sig_handler(int sig){
     //为了保证函数的可重入性，需要保留原来的errno
@@ -53,8 +59,10 @@ void cb_func(client_data *user_data){
     //C++中assert，即断言，可以在程序调试阶段检查错误
     //常用的就比如函数传参时，若是整型，是否超出范围；若是字符串型，地址是否为空等。
     assert(user_data);
-
-    //
+    //close fd
+    close(user_data->sockfd);
+    //减少连接数
+    http_conn::m_user_count--;
 }
 
 
@@ -160,19 +168,73 @@ int main(int argc, char *argv[])
     //将上述epollfd赋值给http类对象的m_epollfd属性
     http_conn::m_epollfd = epollfd; 
 
-    while (true) //循环执行
+    //创建管道套接字
+    ret = socketpair(PF_INET,SOCK_STREAM,0,pipefd);//返回结果， 0为创建成功，-1为创建失败
+    assert(ret != -1);
+
+    //设置管道写端为非阻塞，为什么写端要非阻塞？
+    setnonblocking(pipefd[1]);
+    //设置管道读端为ET非阻塞
+    addfd(epollfd,pipefd[0],false);
+    //传递给主循环的信号值，这里只关注sigalarm和sigterm
+    addsig(SIGALRM,sig_handler,false);
+    addsig(SIGTERM,sig_handler,false);
+    //循环条件
+    bool stop_server = false;
+    //超时标志
+    bool timeout = false;
+    //每隔timeslot时间触发sigalarm信号
+    alarm(TIMESLOT);
+    while (!stop_server) //循环执行
     {
 
         int number = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1); //返回触发事件的文件描述符的集合的数量
+
         //events中保存触发事件的文件描述符的集合
         if ((number < 0) && (errno != EINTR))
         {
             printf("epoll failure\n");
             break;
         }
+        //查询发生事件的文件描述符表
         for (int i = 0; i < number; i++)
         {
             int sockfd = events[i].data.fd;//取出集合中的文件描述符
+
+            //管道读端对应的文件描述符发生读事件
+            if((sockfd == pipefd[0]) && (events[i].events & EPOLLIN)){
+                //是管道读端 且 存在读事件
+                int sig;
+                char signals[1024];
+                //从管道读端读出信号值，成功返回字节数，失败返回-1
+                //正常情况下，这里的ret返回值总是1，只有14和15两个ASCII码对应的字符
+                ret = recv(pipefd[0],signals,sizeof(signals),0);
+                if(ret == -1){
+                    continue;
+                }
+                else if(ret == 0){
+                    continue;
+                }
+                else{
+                    //处理信号值对应的逻辑
+                    for(int i = 0;i<ret;++i){
+                        switch (signals[i])
+                        {
+                        case SIGALRM: //由alarm系统调用产生timer时钟信号
+                            /* code */
+                            timeout = true;
+                            break;
+                        case SIGTERM: //终端发送的终止信号 ctrl+c
+                            stop_server = true;
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+
+            }
+
 
             if (sockfd == listenfd) //如果是监听套接字，那说明有新的连接
             {

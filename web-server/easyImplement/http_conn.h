@@ -21,6 +21,8 @@
 #include "locker.h"
 #include <sys/uio.h>
 //#include "sql_connection_pool.h" //还没写
+
+int setnonblocking(int fd);
 class http_conn
 {
 public:
