@@ -1,0 +1,86 @@
+*********ONE*********
+1JSON（JavaScript Object Notation）是一个用于数据交换的文本格式，现时的标准为ECMA-404。
+
+虽然 JSON 源至于 JavaScript 语言，但它只是一种数据格式，可用于任何编程语言。现时具类似功能的格式有 XML、YAML，当中以 JSON 的语法最为简单。
+
+例如，一个动态网页想从服务器获得数据时，服务器从数据库查找数据，然后把数据转换成 JSON 文本格式：
+{
+    "title": "Design Patterns",
+    "subtitle": "Elements of Reusable Object-Oriented Software",
+    "author": [
+        "Erich Gamma",
+        "Richard Helm",
+        "Ralph Johnson",
+        "John Vlissides"
+    ],
+    "year": 2009,
+    "weight": 1.8,
+    "hardcover": true,
+    "publisher": {
+        "Company": "Pearson Education",
+        "Country": "India"
+    },
+    "website": null
+}
+
+六中类型的数据：
+null null;
+boolean true | false;
+number float;
+string"";
+array[];
+Object{}.
+
+我们要实现的 JSON 库，主要是完成 3 个需求：
+
+把 JSON 文本解析为一个树状数据结构（parse）。
+提供接口访问该数据结构（access）。
+把数据结构转换成 JSON 文本（stringify）。
+
+JSON -> tree -> JSON
+
+JSON 语法子集
+JSON-text = ws value ws
+ws = *(%x20 / %x09 / %x0A / %x0D)
+value = null / false / true 
+null  = "null"
+false = "false"
+true  = "true
+
+当中 %xhh 表示以 16 进制表示的字符，/ 是多选一，* 是零或多个，() 用于分组。
+
+那么第一行的意思是，JSON 文本由 3 部分组成，首先是空白（whitespace），接着是一个值，最后是空白。
+
+第二行告诉我们，所谓空白，是由零或多个空格符（space U+0020）、制表符（tab U+0009）\t、换行符（LF U+000A）\n、
+回车符（CR U+000D）\r所组成。
+
+第三行是说，我们现时的值只可以是 null、false 或 true，它们分别有对应的字面值（literal）。
+
+我们的解析器应能判断输入是否一个合法的 JSON。如果输入的 JSON 不合符这个语法，我们要产生对应的错误码，方便使用者追查问题。
+
+在这个 JSON 语法子集下，我们定义 3 种错误码：
+
+若一个 JSON 只含有空白，传回 LEPT_PARSE_EXPECT_VALUE。
+若一个值之后，在空白之后还有其他字符，传回 LEPT_PARSE_ROOT_NOT_SINGULAR。
+若值不是那三种字面值，传回 LEPT_PARSE_INVALID_VALUE。
+
+
+*********TWO*********
+Test-Driven Development - refactoring重构
+在不改变代码外在行为的情况下，对代码作出修改，以改进程序的内部结构。
+
+number = [ "-" ] int [ frac ] [ exp ]
+int = "0" / digit1-9 *digit
+frac = "." 1*digit
+exp = ("e" / "E") ["-" / "+"] 1*digit
+
+number 是以十进制表示，它主要由 4 部分顺序组成：负号、整数、小数、指数。只有整数是必需部分。
+注意和直觉可能不同的是，正号是不合法的。
+
+整数部分如果是 0 开始，只能是单个 0；而由 1-9 开始的话，可以加任意数量的数字（0-9）。
+也就是说，0123 不是一个合法的 JSON 数字。
+
+小数部分比较直观，就是小数点后是一或多个数字（0-9）。
+
+JSON 可使用科学记数法，指数部分由大写 E 或小写 e 开始，然后可有正负号，之后是一或多个数字（0-9）。
+
