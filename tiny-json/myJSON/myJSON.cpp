@@ -1,5 +1,7 @@
 #include "myJSON.h"
 #include <cassert>
+#include <math.h>
+#include <cstdio>
 
 namespace ben {
 
@@ -137,14 +139,65 @@ namespace ben {
 		return PARSE_OK;
 	}
 
+	const char* parse_hex4(const char* p, unsigned* u) {
+		int i;
+		*u = 0;
+		for (i = 0; i < 4; i++) {
+			char ch = *p++;
+			*u <<= 4; //左移4位？1111 1111 1111 1111
+			if (ch >= '0' && ch <= '9')  *u |= ch - '0';
+			else if (ch >= 'A' && ch <= 'F')  *u |= ch - ('A' - 10);
+			else if (ch >= 'a' && ch <= 'f')  *u |= ch - ('a' - 10);
+			else return NULL; //如果格式不对 不是 4个16进制数字
+		}
+		return p;
+	}
+
+	 // 码点范围	         码点位数	字节1	 字节2	    字节3	      字节4
+	//	U + 0000 ~U + 007F	    7	0xxxxxxx
+	//	U + 0080 ~U + 07FF	    11	110xxxxx	10xxxxxx
+	//	U + 0800 ~U + FFFF	    16	1110xxxx	10xxxxxx	10xxxxxx
+	//	U + 10000 ~U + 10FFFF	21	11110xxx	10xxxxxx	10xxxxxx	10xxxxxx
+	static void encode_utf8(context* c, unsigned u) {
+		if (u <= 0x7F) { //127 7位
+			putc(c, u & 0xFF); //255 8位 按位&
+		}
+		else if (u <= 0x7FF) { // 111 1111 1111,11位
+			putc(c, 0xC0 | ((u >> 6) & 0xFF));
+			putc(c, 0x80 | (u & 0x3F));
+		}
+		else if (u <= 0xFFFF) {
+			putc(c, 0xE0 | ((u >> 12) & 0xFF));
+			putc(c, 0x80 | ((u >> 6) & 0x3F));
+			putc(c, 0x80 | (u & 0x3F));
+		}
+		else {
+			assert(u <= 0x10FFFF);
+			putc(c, 0xF0 | ((u >> 18) & 0xFF));
+			putc(c, 0x80 | ((u >> 12) & 0x3F));
+			putc(c, 0x80 | ((u >> 6) & 0x3F));
+			putc(c, 0x80 | (u & 0x3F));
+		}
+	}
+
+	int STRING_ERROR(context* c,int ret,size_t head) {
+		do { 
+			c->top = head; 
+			return ret; 
+		} while (0);
+	}
+
 	static int parse_string(context* c, json_value* v) {
 		size_t head = c->top;
 		size_t len;
+		unsigned u,u2;
 		const char* p;
 		expect(c, '\"');
 		p = c->json;
 		for (;;) {
 			char ch = *p++;
+			//cout << "打印一下ch:  " << *p << endl;
+			printf("打印一下*p：%s \n", c->json);
 			switch (ch) {
 			case '\"':
 				len = c->top - head;
@@ -153,6 +206,29 @@ namespace ben {
 				return PARSE_OK;
 			case '\\':
 				switch (*p++) {
+				case 'u':
+					if (!(p = parse_hex4(p, &u))) {
+						return PARSE_INVALID_UNICODE_HEX;
+						//STRING_ERROR(c, PARSE_INVALID_UNICODE_HEX, head);
+						break;
+					}
+					if (u >= 0xD800 && u <= 0xDBFF) { /* surrogate pair */
+						if (*p++ != '\\')
+							return PARSE_INVALID_UNICODE_SURROGATE;
+							//STRING_ERROR(c, PARSE_INVALID_UNICODE_SURROGATE, head);
+						if (*p++ != 'u')
+							return PARSE_INVALID_UNICODE_SURROGATE;
+							//STRING_ERROR(c, PARSE_INVALID_UNICODE_SURROGATE, head);
+						if (!(p = parse_hex4(p, &u2)))
+							return PARSE_INVALID_UNICODE_HEX;
+							//STRING_ERROR(c, PARSE_INVALID_UNICODE_HEX, head);
+						if (u2 < 0xDC00 || u2 > 0xDFFF)
+							return PARSE_INVALID_UNICODE_SURROGATE;
+							//STRING_ERROR(c, PARSE_INVALID_UNICODE_SURROGATE, head);
+						u = (((u - 0xD800) << 10) | (u2 - 0xDC00)) + 0x10000;
+					}
+					encode_utf8(c, u);
+					break;
 				case '\"': putc(c, '\"'); break;
 				case '\\': putc(c, '\\'); break;
 				case '/':  putc(c, '/'); break;

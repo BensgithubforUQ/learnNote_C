@@ -31,8 +31,10 @@ namespace ben{
 		PARSE_ROOT_NOT_SINGULAR,
 		PARSE_TO_BIG_NUMBER,
 		PARSE_MISS_QUATATION_MARK,
-		PARSE_INVALID_STRING_ESCAPE,
-		PARSE_INVALID_STRING_CHAR
+		PARSE_INVALID_STRING_ESCAPE, //对其他不合法的字符
+		PARSE_INVALID_STRING_CHAR, 
+		PARSE_INVALID_UNICODE_SURROGATE, //有高代理项而欠缺低代理项，或是低代理项不在合法码点范围
+		PARSE_INVALID_UNICODE_HEX //如果 "\\u" 后不是 4 位十六进位数字
 	};
 
 	void prase_init(json_value* v);
@@ -54,4 +56,7 @@ namespace ben{
 	const char* get_string(const json_value* v);
 	size_t get_string_len(const json_value* v);
 	void set_string(json_value* v, const char* s, size_t len);
+
+	const char* parse_hex4(const char *p, unsigned* u);
+
 }

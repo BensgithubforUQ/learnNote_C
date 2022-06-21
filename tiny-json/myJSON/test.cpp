@@ -29,6 +29,7 @@ void EXPECT_EQ_BASE(bool equality, T expect, T actual, string format) {
 		if (equality)
 			test_pass++;
 		else {
+			printf(".....................................\n");
 			//fprintf(stderr, "%s:%d: expect: " format " actual: " format "\n", __FILE__, __LINE__, expect, actual);
 			main_ret = 1;
 		}
@@ -47,7 +48,8 @@ void EXPECT_EQ_DOUBLE(int expect, int actual) {
 //    EXPECT_EQ_BASE(sizeof(expect) - 1 == alength && memcmp(expect, actual, alength) == 0, expect, actual, "%s")
 void EXPECT_EQ_STRING(const char* expect, const char* actual, size_t alength) {
 	string temp = expect;
-	EXPECT_EQ_BASE(temp.size() == alength && memcmp(expect,actual, alength) == 0, expect, actual, "%s");
+	EXPECT_EQ_BASE(temp == actual, expect, actual, "%s");
+	//EXPECT_EQ_BASE(temp.size() == alength && memcmp(expect,actual, alength) == 0, expect, actual, "%s");
 }
 void EXPECT_TRUE(int actual){
 	EXPECT_EQ_BASE((actual) != 0, "true", "false", "%s");
@@ -163,6 +165,12 @@ static void test_parse_string() {
 	TEST_STRING("Hello", "\"Hello\"");
 	TEST_STRING("Hello\nWorld", "\"Hello\\nWorld\"");
 	TEST_STRING("\" \\ / \b \f \n \r \t", "\"\\\" \\\\ \\/ \\b \\f \\n \\r \\t\"");
+	TEST_STRING("Hello\0World", "\"Hello\\u0000World\"");
+	TEST_STRING("\x24", "\"\\u0024\"");         /* Dollar sign U+0024 */
+	TEST_STRING("\xC2\xA2", "\"\\u00A2\"");     /* Cents sign U+00A2 */
+	TEST_STRING("\xE2\x82\xAC", "\"\\u20AC\""); /* Euro sign U+20AC */
+	TEST_STRING("\xF0\x9D\x84\x9E", "\"\\uD834\\uDD1E\"");  /* G clef sign U+1D11E */
+	TEST_STRING("\xF0\x9D\x84\x9E", "\"\\ud834\\udd1e\"");  /* G clef sign U+1D11E */
 }
 
 static void test_parse_expect_value() {
@@ -215,6 +223,30 @@ static void test_parse_invalid_string_escape() {
 static void test_parse_invalid_string_char() {
 	TEST_ERROR(PARSE_INVALID_STRING_CHAR, "\"\x01\"");
 	TEST_ERROR(PARSE_INVALID_STRING_CHAR, "\"\x1F\"");
+}
+
+static void test_parse_invalid_unicode_hex() {
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u0\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u01\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u012\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u/000\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\uG000\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u0/00\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u0G00\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u00/0\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u00G0\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u000/\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u000G\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_HEX, "\"\\u 123\"");
+}
+
+static void test_parse_invalid_unicode_surrogate() {
+	TEST_ERROR(PARSE_INVALID_UNICODE_SURROGATE, "\"\\uD800\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_SURROGATE, "\"\\uDBFF\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_SURROGATE, "\"\\uD800\\\\\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_SURROGATE, "\"\\uD800\\uDBFF\"");
+	TEST_ERROR(PARSE_INVALID_UNICODE_SURROGATE, "\"\\uD800\\uE000\"");
 }
 
 static void test_access_null() {
@@ -270,7 +302,8 @@ static void test_parse() {
 	test_parse_missing_quotation_mark();
 	test_parse_invalid_string_escape();
 	test_parse_invalid_string_char();
-
+	test_parse_invalid_unicode_hex();
+	test_parse_invalid_unicode_surrogate();
 	test_access_null();
 	test_access_boolean();
 	test_access_number();
@@ -280,5 +313,10 @@ static void test_parse() {
 int main() {
 	test_parse();
 	printf("%d/%d (%3.2f%%) passed\n", test_pass, test_count, test_pass * 100.0 / test_count);
+	printf("\"\"");
+	cout << endl;
+	const char* ch = "\""; //\"ÊÇÒ»¸ö×Ö·û
+	char x = *ch;
+	cout << x << endl;
 	return main_ret;
 }
