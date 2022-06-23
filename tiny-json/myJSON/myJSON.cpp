@@ -14,6 +14,7 @@ namespace ben {
 		char* stack;
 		size_t size;
 		size_t top;
+		
 	}context;
 
 
@@ -73,10 +74,12 @@ namespace ben {
 
 //#define putc(c, ch) do { *(char*)context_push(c, sizeof(char)) = (ch); } while(0)
 
-	static void *context_pop(context* c, size_t size) {//void返回类型
+	static void *context_pop(context* c, size_t size) {//void返回类型,pop出size大小的数据
 		assert(c->top >= size);
 		return c->stack + (c->top -= size);
 	}
+	
+	static int parse_value(context* c, json_value* v);//前置声明
 
 	static void parse_whitespace(context* c) {
 		const char* p = c->json;
@@ -187,6 +190,67 @@ namespace ben {
 		} while (0);
 	}
 
+	static int parse_array(context* c, json_value* v) {
+		int size = 0;
+		int ret;
+		expect(c, '[');
+		parse_whitespace(c);
+		if (*c->json == ']') {//空数组的情况
+			c->json++;
+			v->type = M_ARRAY;
+			v->size = 0;
+			v->arr = NULL;
+			return PARSE_OK;
+		}
+		for (;;) {
+			json_value temp;
+			prase_init(&temp);
+			if ((ret = parse_value(c, &temp)) != PARSE_OK) { //错误
+				printf("array 中 有无法解析的数据\n");
+				break;
+			}
+			memcpy(context_push(c, sizeof(json_value)), &temp, sizeof(json_value));
+			//context_push 返回的是一个堆栈，压入了数组中的成员
+			//把temp json_value压入到这个堆栈里面去。
+			size++;
+			//array = %x5B ws [ value *( ws %x2C ws value ) ] ws %x5D
+			//[[1,2],[3,4],"abc"]
+			//注意，这里是一个递归调用，parse_array调用了parse_value，而parse_value中也有调用parse_array
+			//根据parse_value调用的结果，会把value都存到temp里面，然后把temp存到c里面去。
+			// 注意这里是把json value类型的数据，memcpy到了void类型的context_push的返回值里去了（实际上是char*？但是这里被转成void*暂用了）
+			//void *memcpy(void *str1, const void *str2, size_t n)
+			//str1 -- 指向用于存储复制内容的目标数组，类型强制转换为 void* 指针。
+			//str2 -- 指向要复制的数据源，类型强制转换为 void* 指针。
+			//n -- 要被复制的字节数。
+			parse_whitespace(c);
+			//%x2C是逗号，因此  ws %x2C ws value 
+			if (*c->json == ',') {
+				c->json++;
+				parse_whitespace(c);
+			}
+			else if (*c->json == ']') {//结束了
+				c->json++;
+				v->type = M_ARRAY;
+				v->size = size;
+				cout << "arr_size:" << v->size << endl;
+				size = sizeof(json_value) * size;
+				memcpy(v->arr = (json_value*)malloc(size), context_pop(c, size), size);
+				return PARSE_OK;
+			}
+			else {
+				ret = PARSE_MISS_COMMA_OR_SQUARE_BRACKET;
+				break;
+			}
+		}
+		cout << "解析中，size是：" << size << endl;
+		for (int i = 0; i < size; i++) {
+			json_free((json_value*)context_pop(c,sizeof(json_value))); //结束之后就得把context pop这里面的东西删干净
+			//避免出现悬挂指针
+		}
+		v->type = M_ARRAY;
+		return ret;
+	}
+
 	static int parse_string(context* c, json_value* v) {
 		size_t head = c->top;
 		size_t len;
@@ -263,6 +327,7 @@ namespace ben {
 		case 'n':  return parse_literal(c, v, "null", M_TEXT_NULL);
 		case '\0': return PARSE_EXPECT_VALUE;
 		case '"':  return parse_string(c, v);
+		case '[': return parse_array(c, v);
 		default:   return parse_number(c,v);
 		}
 	}
@@ -290,8 +355,17 @@ namespace ben {
 
 	void json_free(json_value* v) {
 		assert(v != NULL);
-		if (v->type == M_STRING) {
+		switch (v->type) {
+		case M_STRING:
 			free(v->str.s);
+			break;
+		case M_ARRAY:
+			for (int i = 0; i < v->size; i++) {
+				json_free(&v->arr[i]);
+			}
+			free(v->arr);
+			break;
+		default: break;
 		}
 		v->type = M_TEXT_NULL;
 	}
@@ -299,6 +373,7 @@ namespace ben {
 
 	json_type get_type(const json_value* v) {
 		assert(v != NULL);
+		cout <<"000000000000000000" << v->type << endl;
 		return v->type;
 	}
 
@@ -343,5 +418,17 @@ namespace ben {
 		v->str.s[len] = '\0';
 		v->str.len = len;
 		v->type =  M_STRING;
+	}
+
+	size_t get_array_size(const json_value* v) {
+		assert(v != NULL && v->type ==	M_ARRAY);
+		cout << "size:???::: " << v->size << endl;
+		return v->size;
+	}
+	json_value* get_array_element(const json_value* v, size_t index) {
+		assert(v != NULL && v->type == M_ARRAY);
+		cout << index << " " << v->size << endl;
+		assert(index < v->size);
+		return &v->arr[index];
 	}
 }

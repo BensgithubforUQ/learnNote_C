@@ -84,3 +84,20 @@ number 是以十进制表示，它主要由 4 部分顺序组成：负号、整�
 
 JSON 可使用科学记数法，指数部分由大写 E 或小写 e 开始，然后可有正负号，之后是一或多个数字（0-9）。
 
+*********string*********
+
+string = quotation-mark *char quotation-mark              " *char"
+char = unescaped /
+   escape (
+       %x22 /          ; "    quotation mark  U+0022
+       %x5C /          ; \    reverse solidus U+005C
+       %x2F /          ; /    solidus         U+002F
+       %x62 /          ; b    backspace       U+0008
+       %x66 /          ; f    form feed       U+000C
+       %x6E /          ; n    line feed       U+000A
+       %x72 /          ; r    carriage return U+000D
+       %x74 /          ; t    tab             U+0009
+       %x75 4HEXDIG )  ; uXXXX                U+XXXX
+escape = %x5C          ; \
+quotation-mark = %x22  ; "
+unescaped = %x20-21 / %x23-5B / %x5D-10FFFF

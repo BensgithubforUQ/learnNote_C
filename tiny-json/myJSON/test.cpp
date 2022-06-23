@@ -58,6 +58,10 @@ void EXPECT_FALSE(int actual) {
 	EXPECT_EQ_BASE((actual) == 0, "false", "true", "%s");
 }
 
+void EXPECT_EQ_SIZE_T(int expect, int actual) {
+	EXPECT_EQ_BASE((expect) == (actual), actual, expect, "%d");
+}
+
 void TEST_ERROR(int error, const char* json) {
 	do {
 		json_value v;
@@ -171,6 +175,51 @@ static void test_parse_string() {
 	TEST_STRING("\xE2\x82\xAC", "\"\\u20AC\""); /* Euro sign U+20AC */
 	TEST_STRING("\xF0\x9D\x84\x9E", "\"\\uD834\\uDD1E\"");  /* G clef sign U+1D11E */
 	TEST_STRING("\xF0\x9D\x84\x9E", "\"\\ud834\\udd1e\"");  /* G clef sign U+1D11E */
+}
+
+static void test_parse_array() {
+	size_t i, j;
+	json_value v;
+
+	prase_init(&v);
+	EXPECT_EQ_INT(PARSE_OK, parse(&v, "[ ]"));
+	EXPECT_EQ_INT(M_ARRAY, get_type(&v));
+	EXPECT_EQ_SIZE_T(0, get_array_size(&v));
+	json_free(&v);
+
+	prase_init(&v);
+	EXPECT_EQ_INT(PARSE_OK, parse(&v, "[ null , false , true , 123 , \"abc\" ]"));
+	EXPECT_EQ_INT(M_ARRAY, get_type(&v));
+	EXPECT_EQ_SIZE_T(5, get_array_size(&v));
+	EXPECT_EQ_INT(M_TEXT_NULL, get_type(get_array_element(&v, 0)));
+	EXPECT_EQ_INT(M_TEXT_FALSE, get_type(get_array_element(&v, 1)));
+	EXPECT_EQ_INT(M_TEXT_TRUE, get_type(get_array_element(&v, 2)));
+	EXPECT_EQ_INT(M_NUMBER, get_type(get_array_element(&v, 3)));
+	EXPECT_EQ_INT(M_STRING, get_type(get_array_element(&v, 4)));
+	EXPECT_EQ_DOUBLE(123.0, get_number(get_array_element(&v, 3)));
+	EXPECT_EQ_STRING("abc", get_string(get_array_element(&v, 4)), get_string_len(get_array_element(&v, 4)));
+	json_free(&v);
+
+	prase_init(&v);
+	EXPECT_EQ_INT(PARSE_OK, parse(&v, "[ [ ] , [ 0 ] , [ 0 , 1 ] , [ 0 , 1 , 2 ] ]"));
+	cout << endl;
+	for (int i = 0; i < 4; i++) {
+		printf("%d\n", v.type);
+	}
+	EXPECT_EQ_INT(M_ARRAY, get_type(&v));
+	cout << "sizeÊÇ:" << get_array_size(&v) << endl;
+	EXPECT_EQ_SIZE_T(5, get_array_size(&v));
+	for (i = 0; i < 4; i++) {
+		json_value* a = get_array_element(&v, i);
+		EXPECT_EQ_INT(M_ARRAY, get_type(a));
+		EXPECT_EQ_SIZE_T(i, get_array_size(a));
+		for (j = 0; j < i; j++) {
+			json_value* e = get_array_element(a, j);
+			EXPECT_EQ_INT(M_NUMBER, get_type(e));
+			EXPECT_EQ_DOUBLE((double)j, get_number(e));
+		}
+	}
+	json_free(&v);
 }
 
 static void test_parse_expect_value() {
@@ -288,6 +337,13 @@ static void test_access_string() {
 	json_free(&v);
 }
 
+static void test_parse_miss_comma_or_square_bracket() {
+	TEST_ERROR(PARSE_MISS_COMMA_OR_SQUARE_BRACKET, "[1");
+	TEST_ERROR(PARSE_MISS_COMMA_OR_SQUARE_BRACKET, "[1}");
+	TEST_ERROR(PARSE_MISS_COMMA_OR_SQUARE_BRACKET, "[1 2");
+	TEST_ERROR(PARSE_MISS_COMMA_OR_SQUARE_BRACKET, "[[]");
+}
+
 static void test_parse() {
 	test_parse_null();
 	test_parse_true();
@@ -298,16 +354,17 @@ static void test_parse() {
 	test_parse_invalid_value();
 	test_parse_root_not_singular();
 	test_parse_number_too_big();
-
+	test_parse_array();
 	test_parse_missing_quotation_mark();
 	test_parse_invalid_string_escape();
 	test_parse_invalid_string_char();
 	test_parse_invalid_unicode_hex();
 	test_parse_invalid_unicode_surrogate();
-	test_access_null();
+	test_parse_miss_comma_or_square_bracket();
+	/*test_access_null();
 	test_access_boolean();
 	test_access_number();
-	test_access_string();
+	test_access_string();*/
 }
 
 int main() {

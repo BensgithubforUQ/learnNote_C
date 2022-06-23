@@ -1,36 +1,56 @@
-#ifndef LEPTJSON_H_
-#define LEPTJSON_H_
+#ifndef LEPTJSON_H__
+#define LEPTJSON_H__
 
-//JSON 中有 6 种数据类型，如果把 true 和 false 当作两个类型就是 7 种，为此声明一个枚举类型（enumeration type）：
+#include <stddef.h> /* size_t */
+
 typedef enum { LEPT_NULL, LEPT_FALSE, LEPT_TRUE, LEPT_NUMBER, LEPT_STRING, LEPT_ARRAY, LEPT_OBJECT } lept_type;
-//null, false, true, float, "", [] , {};
 
-typedef struct
-{
-    /* 我们声明 JSON 的数据结构。JSON 是一个树形结构，
-    我们最终需要实现一个树的数据结构，每个节点使用 lept_value 结构体表示，
-    我们会称它为一个 JSON 值（JSON value）。  */
+typedef struct lept_value lept_value;
+
+struct lept_value {
+    union {
+        struct { lept_value* e; size_t size; }a;    /* array:  elements, element count */
+        struct { char* s; size_t len; }s;           /* string: null-terminated string, string length */
+        double n;                                   /* number */
+    }u;
     lept_type type;
-    double num; //LEPT_NUMBER
-
-}lept_value;//json的树形数据结构
-
-
-
-
-
-
-enum {
-    LEPT_PARSE_OK = 0, //正确的json格式
-    LEPT_PARSE_EXPECT_VALUE, // 若一个 JSON 只含有空白，传回 LEPT_PARSE_EXPECT_VALUE。
-    LEPT_PARSE_INVALID_VALUE, //其他错误，比如无效的值
-    LEPT_PARSE_ROOT_NOT_SINGULAR, // 若一个值之后，在空白之后还有其他字符，传回 LEPT_PARSE_ROOT_NOT_SINGULAR。
-    LEPT_PARSE_NUMBER_TOO_BIG //数字太大
 };
 
-//解析 JSON：
-int lept_parse(lept_value *v,const char* json);
-//访问结果的函数，就是获取其类型：
+enum {
+    LEPT_PARSE_OK = 0,
+    LEPT_PARSE_EXPECT_VALUE,
+    LEPT_PARSE_INVALID_VALUE,
+    LEPT_PARSE_ROOT_NOT_SINGULAR,
+    LEPT_PARSE_NUMBER_TOO_BIG,
+    LEPT_PARSE_MISS_QUOTATION_MARK,
+    LEPT_PARSE_INVALID_STRING_ESCAPE,
+    LEPT_PARSE_INVALID_STRING_CHAR,
+    LEPT_PARSE_INVALID_UNICODE_HEX,
+    LEPT_PARSE_INVALID_UNICODE_SURROGATE,
+    LEPT_PARSE_MISS_COMMA_OR_SQUARE_BRACKET
+};
+
+#define lept_init(v) do { (v)->type = LEPT_NULL; } while(0)
+
+int lept_parse(lept_value* v, const char* json);
+
+void lept_free(lept_value* v);
+
 lept_type lept_get_type(const lept_value* v);
-double lept_get_number(const lept_value *v);
-#endif
+
+#define lept_set_null(v) lept_free(v)
+
+int lept_get_boolean(const lept_value* v);
+void lept_set_boolean(lept_value* v, int b);
+
+double lept_get_number(const lept_value* v);
+void lept_set_number(lept_value* v, double n);
+
+const char* lept_get_string(const lept_value* v);
+size_t lept_get_string_length(const lept_value* v);
+void lept_set_string(lept_value* v, const char* s, size_t len);
+
+size_t lept_get_array_size(const lept_value* v);
+lept_value* lept_get_array_element(const lept_value* v, size_t index);
+
+#endif /* LEPTJSON_H__ */*/

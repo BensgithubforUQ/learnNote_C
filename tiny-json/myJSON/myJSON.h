@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 namespace ben{
@@ -13,7 +14,10 @@ namespace ben{
 		M_OBJECT,
 	}json_type;
 
-	struct json_value {
+	typedef struct json_value json_value;
+
+	class json_value {
+	public:
 		union {
 			struct {
 				char* s; //字符串
@@ -22,6 +26,8 @@ namespace ben{
 			double num; //json中的数字
 		};
 		json_type type;
+		json_value* arr;
+		int size;
 	};
 
 	enum {
@@ -34,7 +40,8 @@ namespace ben{
 		PARSE_INVALID_STRING_ESCAPE, //对其他不合法的字符
 		PARSE_INVALID_STRING_CHAR, 
 		PARSE_INVALID_UNICODE_SURROGATE, //有高代理项而欠缺低代理项，或是低代理项不在合法码点范围
-		PARSE_INVALID_UNICODE_HEX //如果 "\\u" 后不是 4 位十六进位数字
+		PARSE_INVALID_UNICODE_HEX, //如果 "\\u" 后不是 4 位十六进位数字
+		PARSE_MISS_COMMA_OR_SQUARE_BRACKET //缺少]或者, 其实也是格式不对
 	};
 
 	void prase_init(json_value* v);
@@ -58,5 +65,8 @@ namespace ben{
 	void set_string(json_value* v, const char* s, size_t len);
 
 	const char* parse_hex4(const char *p, unsigned* u);
+
+	size_t get_array_size(const json_value* v);
+	json_value* get_array_element(const json_value* v, size_t index);
 
 }
