@@ -106,8 +106,8 @@ namespace ben {
 		//单个0
 		if (*p == '0') {
 			p++;
-			printf("%s\n", p);
-			if(( * p != '.') && ( * p != NULL)) return PARSE_ROOT_NOT_SINGULAR;
+			//printf("%s\n", p);
+			//if(( * p != '.') && ( * p != NULL) && (*p != ' ')) return PARSE_ROOT_NOT_SINGULAR;
 		}
 		else {
 			printf("%s\n", p);
@@ -189,7 +189,7 @@ namespace ben {
 			return ret; 
 		} while (0);
 	}
-
+	//"[ [ ] , [ 0 ] , [ 0 , 1 ] , [ 0 , 1 , 2 ] ]"
 	static int parse_array(context* c, json_value* v) {
 		int size = 0;
 		int ret;
@@ -203,6 +203,7 @@ namespace ben {
 			return PARSE_OK;
 		}
 		for (;;) {
+			printf("打印一下*p：%s \n", c->json);
 			json_value temp;
 			prase_init(&temp);
 			if ((ret = parse_value(c, &temp)) != PARSE_OK) { //错误
@@ -247,7 +248,7 @@ namespace ben {
 			json_free((json_value*)context_pop(c,sizeof(json_value))); //结束之后就得把context pop这里面的东西删干净
 			//避免出现悬挂指针
 		}
-		v->type = M_ARRAY;
+
 		return ret;
 	}
 
@@ -373,7 +374,7 @@ namespace ben {
 
 	json_type get_type(const json_value* v) {
 		assert(v != NULL);
-		cout <<"000000000000000000" << v->type << endl;
+		cout <<"000000000000000000:  " << v->type << endl;
 		return v->type;
 	}
 

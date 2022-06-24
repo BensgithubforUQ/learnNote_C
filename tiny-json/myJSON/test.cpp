@@ -1,4 +1,5 @@
 #include "myJSON.h"
+#include <set>
 using namespace ben;
 
 
@@ -208,7 +209,7 @@ static void test_parse_array() {
 	}
 	EXPECT_EQ_INT(M_ARRAY, get_type(&v));
 	cout << "size是:" << get_array_size(&v) << endl;
-	EXPECT_EQ_SIZE_T(5, get_array_size(&v));
+	EXPECT_EQ_SIZE_T(4, get_array_size(&v));
 	for (i = 0; i < 4; i++) {
 		json_value* a = get_array_element(&v, i);
 		EXPECT_EQ_INT(M_ARRAY, get_type(a));
@@ -375,5 +376,18 @@ int main() {
 	const char* ch = "\""; //\"是一个字符
 	char x = *ch;
 	cout << x << endl;
-	return main_ret;
+	
+	/*struct x {
+		double b;
+		char c;
+		vector<char>a;
+	}x1;
+	int *m = new int[0];
+	x1.a.push_back('a');
+	x1.a.push_back('b');
+	cout << sizeof(x1) <<" " <<sizeof(x1.b)<< " "<<sizeof(x1.c) << " " <<sizeof(x1.a)<< endl;
+	cout << (int)&x1.a[0] << " " << (int)&x1.a[1] << " " << (int)&( * m) << " " << (int)&(m) <<endl;
+	cout << (int) & x1 << " " << (int)&(x1.b) << " " << (int)&x1.c << " " << (int)&x1.a<<endl;
+	return 0;*/
+	return 0;
 }
