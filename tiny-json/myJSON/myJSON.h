@@ -15,7 +15,7 @@ namespace ben{
 	}json_type;
 
 	typedef struct json_value json_value;
-
+	typedef struct json_object json_object;
 	class json_value {
 	public:
 		union {
@@ -28,6 +28,16 @@ namespace ben{
 		json_type type;
 		json_value* arr;
 		int size;
+		
+		//object的数组
+		json_object* object;
+		size_t o_size;
+	};
+
+	struct json_object {
+		char* k;
+		size_t k_len;
+		json_value v;
 	};
 
 	enum {
@@ -41,7 +51,10 @@ namespace ben{
 		PARSE_INVALID_STRING_CHAR, 
 		PARSE_INVALID_UNICODE_SURROGATE, //有高代理项而欠缺低代理项，或是低代理项不在合法码点范围
 		PARSE_INVALID_UNICODE_HEX, //如果 "\\u" 后不是 4 位十六进位数字
-		PARSE_MISS_COMMA_OR_SQUARE_BRACKET //缺少]或者, 其实也是格式不对
+		PARSE_MISS_COMMA_OR_SQUARE_BRACKET, //缺少]或者, 其实也是格式不对
+		PARSE_MISS_KEY, //缺少键
+		PARSE_MISS_COLON, //缺少冒号
+		PARSE_MISS_COMMA_OR_CURLY_BRACKET //缺少逗号
 	};
 
 	void prase_init(json_value* v);
@@ -68,5 +81,11 @@ namespace ben{
 
 	size_t get_array_size(const json_value* v);
 	json_value* get_array_element(const json_value* v, size_t index);
+
+
+	size_t get_object_size(const json_value* v);
+	const char* get_object_key(const json_value* v, size_t index);
+	size_t get_object_key_length(const json_value* v, size_t index);
+	json_value* get_object_value(const json_value* v, size_t index);
 
 }
