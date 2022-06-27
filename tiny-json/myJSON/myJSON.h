@@ -88,4 +88,6 @@ namespace ben{
 	size_t get_object_key_length(const json_value* v, size_t index);
 	json_value* get_object_value(const json_value* v, size_t index);
 
+	char* json_stringify(const json_value* v, size_t* length);
+
 }

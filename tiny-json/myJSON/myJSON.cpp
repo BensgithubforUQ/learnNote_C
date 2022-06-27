@@ -9,6 +9,11 @@ namespace ben {
 	#define PARSE_STACK_INIT_SIZE 256
 	#endif
 
+	#ifndef PARSE_STRINGIFY_INIT_SIZE
+	#define PARSE_STRINGIFY_INIT_SIZE 256
+	#endif // ! PARSE_STRINGIFY_INIT_SIZE
+
+
 	typedef struct { //为了便于交换数据，存在这个结构体里面
 		const char* json;
 		char* stack;
@@ -47,6 +52,8 @@ namespace ben {
 		json_free(v);
 	}
 
+
+
 	static void* context_push(context* c, size_t size) {
 		void* ret;
 		assert(size > 0);
@@ -62,6 +69,10 @@ namespace ben {
 		return ret;
 	}
 
+	void puts(context* c, const char* s, size_t length) {
+		memcpy(context_push(c, length), s, length);
+	}
+
 	void putc(context* c, char ch) {
 		do {
 			/*char* temp;
@@ -72,6 +83,8 @@ namespace ben {
 		} while (0);
 	}
 
+
+	
 //#define putc(c, ch) do { *(char*)context_push(c, sizeof(char)) = (ch); } while(0)
 
 	static void *context_pop(context* c, size_t size) {//void返回类型,pop出size大小的数据
@@ -606,4 +619,82 @@ namespace ben {
 		assert(index < v->o_size);
 		return &v->object[index].v;
 	}
+
+	static void stringify_string(context* c, const char* s, size_t len) {
+		static const char hex_digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		size_t i, size;
+		char* head, * p;
+		assert(s != NULL);
+		p = head = (char*)context_push(c, size = len * 6 + 2); /* "\u00xx..." */
+		*p++ = '"';
+		for (i = 0; i < len; i++) {
+			unsigned char ch = (unsigned char)s[i];
+			switch (ch) {
+			case '\"': *p++ = '\\'; *p++ = '\"'; break;
+			case '\\': *p++ = '\\'; *p++ = '\\'; break;
+			case '\b': *p++ = '\\'; *p++ = 'b';  break;
+			case '\f': *p++ = '\\'; *p++ = 'f';  break;
+			case '\n': *p++ = '\\'; *p++ = 'n';  break;
+			case '\r': *p++ = '\\'; *p++ = 'r';  break;
+			case '\t': *p++ = '\\'; *p++ = 't';  break;
+			default:
+				if (ch < 0x20) {
+					*p++ = '\\'; *p++ = 'u'; *p++ = '0'; *p++ = '0';
+					*p++ = hex_digits[ch >> 4];
+					*p++ = hex_digits[ch & 15];
+				}
+				else
+					*p++ = s[i];
+			}
+		}
+		*p++ = '"';
+		c->top -= size - (p - head);
+	}
+
+	static void stringify_value(context* c, const json_value* v) {
+		size_t i;
+		switch (v->type) {
+		case M_TEXT_NULL:   puts(c, "null", 4); break;
+		case M_TEXT_FALSE:  puts(c, "false", 5); break;
+		case M_TEXT_TRUE:   puts(c, "true", 4); break;
+		case M_NUMBER: c->top -= 32 - sprintf_s((char*)context_push(c, 32),256, "%.17g", v->num); break;
+		case M_STRING: stringify_string(c, v->str.s,v->str.len); break;
+		case M_ARRAY:
+			putc(c, '[');
+			for (i = 0; i < v->size; i++) {
+				if (i > 0)
+					putc(c, ',');
+				stringify_value(c, &v->arr[i]);
+			}
+			putc(c, ']');
+			break;
+		case M_OBJECT:
+			putc(c, '{');
+			for (i = 0; i < v->o_size; i++) {
+				if (i > 0)
+					putc(c, ',');
+				stringify_string(c, v->object[i].k, v->object[i].k_len);
+				putc(c, ':');
+				stringify_value(c, &v->object[i].v);
+			}
+			putc(c, '}');
+			break;
+		default: assert(0 && "invalid type");
+		}
+	}
+	
+	char* json_stringify(const json_value* v, size_t* length) {
+		context c;
+		int ret;
+		assert(v != NULL);
+		c.stack = (char*)malloc(c.size = PARSE_STRINGIFY_INIT_SIZE);
+		c.top = 0;
+		stringify_value(&c, v);
+		if (length) {
+			*length = c.top;
+		}
+		putc(&c, '\0');
+		return c.stack;
+	}
+	
 }

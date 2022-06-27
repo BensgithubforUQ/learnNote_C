@@ -413,7 +413,12 @@ int main() {
 	x1.a.push_back('a');
 	x1.a.push_back('b');
 	cout << sizeof(x1) <<" " <<sizeof(x1.b)<< " "<<sizeof(x1.c) << " " <<sizeof(x1.a)<< endl;
-	cout << (int)&x1.a[0] << " " << (int)&x1.a[1] << " " << (int)&( * m) << " " << (int)&(m) <<endl;
+	cout << (int)&x1.a[0] << " " << (int)&x1.a[1] << " " << (int)&
+	
+	
+	
+	
+	( * m) << " " << (int)&(m) <<endl;
 	cout << (int) & x1 << " " << (int)&(x1.b) << " " << (int)&x1.c << " " << (int)&x1.a<<endl;
 	return 0;*/
 	return 0;
