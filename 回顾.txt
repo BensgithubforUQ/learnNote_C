@@ -17,3 +17,73 @@
 14.多线程的api，线程和进程的区别。
 15.锁，互斥，死锁，读写锁，信号灯，条件变量。
 16.生产者消费者模型。
+
+
+1 变量的声明和定义有什么区别
+2 简述#ifdef、#else、#endif和#ifndef的作用
+3 写出int 、bool、 float、指针变量与 “零值”比较的if语句
+4 结构体可以直接赋值吗
+5sizeof和strlen的区别
+6 C 语言的关键字static和 C++ 的关键字static有什么区别
+7 Ｃ 语言的malloc和 Ｃ＋＋ 中的new有什么区别
+8 写一个 “标准”宏MIN
+9 ++i和i++的区别
+10 volatile有什么作用
+11 一个参数可以既是const又是volatile吗
+12 a和&a有什么区别
+13 用 C 编写一个死循环程序
+14 结构体内存对齐问题
+15 全局变量和局部变量有什么区别？实怎么实现的？操作系统和编译器是怎么知道的？
+16 简述 C、C++ 程序编译的内存分配情况
+17 简述strcpy、sprintf与memcpy的区别
+18 请解析(*(void (*)( ) )0)( )的含义
+19 C语言的指针和引用和c++的有什么区别？
+20 typedef和define有什么区别
+21 指针常量与常量指针区别
+22 简述队列和栈的异同
+23 设置地址为0x67a9的整型变量的值为0xaa66
+24 编码实现字符串转化为数字
+25 C 语言的结构体和 C++ 的有什么区别
+26 简述指针常量与常量指针的区别
+27 如何避免“野指针”
+28 句柄和指针的区别和联系是什么？
+29 new/delete与malloc/free的区别是什么
+30 说一说extern“C”
+31 请你来说一下 C++ 中struct和class的区别
+32 C++ 类内可以定义引用数据成员吗？
+33 C++ 中类成员的访问权限
+34 什么是右值引用，跟左值又有什么区别？
+35 面向对象的三大特征
+36 说一说 c++ 中四种cast转换
+37 C++ 的空类有哪些成员函数
+38 对 c++ 中的smart pointer四个智能指针：shared_ptr,unique_ptr,weak_ptr,auto_ptr的理解
+39 说说强制类型转换运算符
+40 谈谈你对拷贝构造函数和赋值运算符的认识
+41 在 C++ 中，使用 malloc申请的内存能否通过delete释放？使用new申请的内存能否用free？
+42 用 C++ 设计一个不能被继承的类
+43 C++ 自己实现一个String类
+44 访问基类的私有虚函数
+45 对虚函数和多态的理解
+46 简述类成员函数的重写、重载和隐藏的区别
+47 链表和数组有什么区别
+48 用两个栈实现一个队列的功能
+49 vector的底层原理
+50 vector中的reserve和resize的区别
+51 vector中的size和capacity的区别
+52 vector中erase方法与algorithn中的remove`方法区别
+53 vector迭代器失效的情况
+54 正确释放vector的内存(clear(), swap(), shrink_to_fit())
+55 list的底层原理
+56 什么情况下用vector，什么情况下用list，什么情况下用 deque
+57 priority_queue的底层原理
+58 map 、set、multiset、multimap的底层原理
+59 为何map和set的插入删除效率比其他序列容器高
+60 为何map和set每次Insert之后，以前保存的iterator不会失效？
+61 当数据元素增多时（从 10000 到 20000），map的set的查找速度会怎样变化？
+62 map 、set、multiset、multimap的特点
+63 为何map和set的插入删除效率比其他序列容器高，而且每次insert 之后，以前保存的iter
+64 为何map和set不能像vector一样有个reserve函数来预分配数据?
+65 set的底层实现实现为什么不用哈希表而使用红黑树？
+66 hash_map与map的区别？什么时候用hash_map，什么时候用map？
+67 迭代器失效的问题
+68 STL线程不安全的情况
