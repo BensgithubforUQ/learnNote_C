@@ -127,8 +127,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="interview_experiment.cpp" />
+    <ClCompile Include="内存分配.cpp" />
+    <ClCompile Include="各种函数和关键字.cpp" />
+    <ClCompile Include="多态和结构体内存对齐.cpp" />
     <ClCompile Include="poly.h" />
+    <ClCompile Include="字符串和字符类型数组.cpp" />
+    <ClCompile Include="引用.cpp" />
+    <ClCompile Include="智能指针.cpp" />
+    <ClCompile Include="模板.cpp" />
+    <ClCompile Include="面向对象.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
