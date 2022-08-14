@@ -42,13 +42,13 @@ private:
 };
 
 int a1;
-int main() {
-	const int *b = &a1;
-	static int a;
-	int* num = (int*)malloc(sizeof(int) * 10); //堆区
-	int* p = new int(256);
-	int* arr = new int[5](); //括号里面不能写数字
-	for (int i = 0; i < 10; i++) *(num+i) = i;
+//int main() {
+//	const int *b = &a1;
+//	static int a;
+//	int* num = (int*)malloc(sizeof(int) * 10); //堆区
+//	int* p = new int(256);
+//	int* arr = new int[5](); //括号里面不能写数字
+//	for (int i = 0; i < 10; i++) *(num+i) = i;
 
 
 
@@ -58,17 +58,17 @@ int main() {
 	//cout<<"num[9]:" << num[9] << " 地址" << (int)num<<endl;
 	//cout << "int *p" << *p << " 地址 " << (int)p << endl;
 	//cout << "abcde" << " 地址 " << (int)&("abcde") << endl;
-	free(num); 
-	delete p;
-
-	for (int i = 0; i < 5; i++) cout << arr[i] << " ";
-	delete[] arr;
-
-	C c;
-	C *c1 = (C*)malloc(sizeof(c)); //malloc不会调用构造函数
-	if (c1 == NULL) cout << "NULL诶" << endl;
-	C* c2 = new C(); //而new会
-	cout << "sizeof c " << sizeof(c) << endl;//虚函数表，参与内存对齐
-	cout << "sizeof c1 " << sizeof(c1) << endl;
-	return 0;
-}
+//	free(num); 
+//	delete p;
+//
+//	for (int i = 0; i < 5; i++) cout << arr[i] << " ";
+//	delete[] arr;
+//
+//	C c;
+//	C *c1 = (C*)malloc(sizeof(c)); //malloc不会调用构造函数
+//	if (c1 == NULL) cout << "NULL诶" << endl;
+//	C* c2 = new C(); //而new会
+//	cout << "sizeof c " << sizeof(c) << endl;//虚函数表，参与内存对齐
+//	cout << "sizeof c1 " << sizeof(c1) << endl;
+//	return 0;
+//}

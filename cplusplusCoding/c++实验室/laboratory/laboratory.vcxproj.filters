@@ -39,8 +39,16 @@
     <ClCompile Include="各种函数和关键字.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="模板.cpp">
+    <ClCompile Include="设计模式.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="factory.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="abstractFactory.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

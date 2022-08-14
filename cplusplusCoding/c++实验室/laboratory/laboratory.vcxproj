@@ -134,8 +134,12 @@
     <ClCompile Include="字符串和字符类型数组.cpp" />
     <ClCompile Include="引用.cpp" />
     <ClCompile Include="智能指针.cpp" />
-    <ClCompile Include="模板.cpp" />
+    <ClCompile Include="设计模式.cpp" />
     <ClCompile Include="面向对象.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="abstractFactory.hpp" />
+    <ClInclude Include="factory.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
