@@ -7,7 +7,7 @@
 #include "singleton.hpp"
 #include "poly.h"
 using namespace std;
-
+ int testint = 10;
 void test_factory() {
 	//工厂模式
 	Factory* fac = new ConcreteFactory();
@@ -82,16 +82,38 @@ void test_poly() {
 	cout << sizeof(s) << " ";
 }
 
-void test_strcpy(char * &c) {
-	c = (char*)malloc(100);
+void test_strcpy(char * c) {
+	//c = (char*)malloc(100);
+	int i;
+	char str[10], str1[10];
+	if (strlen(c) <= 10) strcpy(str, c);
+	cout << strlen(c) << endl;
 }
+
+
 
 int main() {
 	//test_SingletonHungry();
 	//test_SingletonsLazy();
-	char* p = nullptr;
-	test_strcpy(p);
-	if(p!=nullptr) strcpy(p, "abcdedf");
-	printf("%s\n", p);
+	//char* p = nullptr;
+	//test_strcpy(p);
+	//if(p!=nullptr) strcpy(p, "abcdedf");
+	//printf("%s\n", p);
+	
+
+	//int a = 15, b = 26; //括号表达式
+	//cout << (a, b) << endl;
+
+	//   C++把"cout << 字符型指针"这种输出格式安排给输出字符串了，
+	// 就是说它被编译器解释为从指针开始一个接一个地输出内存单元里的字符，
+	// 直到遇到'\0'时为止。要想输出地址你强制成别的类型就可以了：如cout << (void *)&c << endl;就可以.
+	//char c[] = {'0','1','2','3','\0'};
+	//char* const p1 = c + 1;
+	////char* c1 = "0123456789";
+	//cout << *p1 << endl;
+	//char d = 'n';
+	////d = *p1;
+	//cout << (void*) & d << endl;
+	//test_strcpy(c);
 	return 0;
 }

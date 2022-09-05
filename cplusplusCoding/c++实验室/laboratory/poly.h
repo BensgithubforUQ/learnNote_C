@@ -2,7 +2,7 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-
+static int testint = 10;
 class Poly {
 public:
 	Poly() { cout << "父类的构造" << endl; };
