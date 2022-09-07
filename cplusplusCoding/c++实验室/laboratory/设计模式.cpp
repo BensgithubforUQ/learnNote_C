@@ -7,7 +7,7 @@
 #include "singleton.hpp"
 #include "poly.h"
 using namespace std;
- int testint = 10;
+
 void test_factory() {
 	//工厂模式
 	Factory* fac = new ConcreteFactory();
@@ -115,5 +115,15 @@ int main() {
 	////d = *p1;
 	//cout << (void*) & d << endl;
 	//test_strcpy(c);
+
+	//vector<char>和string
+	//string s1 = "123456789";
+	//s1 += '\0';
+	//s1 += '0';
+	//cout << s1.back() << " " << s1.size() << endl;
+	//vector<char> s2{ '1','2','3','4','5','6','7','8','9','\0' };
+	//s2.push_back('\0');
+	////s2.push_back('0');
+	//cout << s2.back() << " " << s2.size() << endl;
 	return 0;
 }
