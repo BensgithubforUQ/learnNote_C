@@ -12,6 +12,7 @@ public:
 protected:
 	Product(){ cout << "Product construct..." << endl; }
 private:
+	int x;
 };
 
 class ConcreteProduct :public Product { //public¼Ì³Ð
