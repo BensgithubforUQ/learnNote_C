@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="templateFunc.cpp" />
     <ClCompile Include="内存分配.cpp" />
     <ClCompile Include="各种函数和关键字.cpp" />
     <ClCompile Include="多态和结构体内存对齐.cpp" />

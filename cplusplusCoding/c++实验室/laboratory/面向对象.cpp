@@ -6,12 +6,15 @@ public:
 	father() {}
 	virtual void print() = 0;
 	virtual ~father() {}
+	
+private:
+	int a1;
 };
 //继承一下
 class son : public father { //子类
 public:
 	son() {}; //无参构造 
-	son(int _a, char _b, char *_str) :a(_a), b(_b) { 
+	son(int a_1,int _a, char _b, char *_str) :a(_a), b(_b) {
 		str = new char(*_str); //深拷贝
 	} //有参构造函数
 	son(const son& s) { //重载的拷贝构造

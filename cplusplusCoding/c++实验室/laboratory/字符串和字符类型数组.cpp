@@ -8,7 +8,7 @@ using namespace std;
 //	char b[6] = { 'a','b','c','d','e' }; //字符型数组,同时是字符串
 //	char c[5] = { 'a','b','c','d','e' };
 //	//strlen c语言的库函数
-//	cout << strlen(a) << " " << strlen(b) <<" "<<strlen(c)<< endl;
+//	cout << strlen(a ) << " " << strlen(b) <<" "<<strlen(c)<< endl;
 //	//sizeof c++的运算符
 //	cout << sizeof(a) << " " << sizeof(b) << " " <<sizeof(c) << endl;
 //	printf("%s, %d\n", b,&b);

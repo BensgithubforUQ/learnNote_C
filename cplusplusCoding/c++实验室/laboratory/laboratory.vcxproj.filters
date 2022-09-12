@@ -42,6 +42,9 @@
     <ClCompile Include="设计模式.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="templateFunc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="factory.hpp">

@@ -12,6 +12,7 @@ void test_factory() {
 	//工厂模式
 	Factory* fac = new ConcreteFactory();
 	Product* pro = fac->CreateProduct();
+	
 	delete fac;
 	delete pro;
 	//经过测试，发现factory和product除了是用工厂类调用create产品类以外，没有关系，析构顺序不相关。
@@ -125,5 +126,8 @@ int main() {
 	//s2.push_back('\0');
 	////s2.push_back('0');
 	//cout << s2.back() << " " << s2.size() << endl;
+
+	unique_ptr<int> u_ptr = make_unique<int>(114514);
+	cout << *u_ptr << endl;
 	return 0;
 }
