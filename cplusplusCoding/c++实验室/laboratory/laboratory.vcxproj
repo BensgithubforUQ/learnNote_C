@@ -142,6 +142,7 @@
     <ClInclude Include="abstractFactory.hpp" />
     <ClInclude Include="factory.hpp" />
     <ClInclude Include="singleton.hpp" />
+    <ClInclude Include="test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

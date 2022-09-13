@@ -93,7 +93,7 @@ void test_strcpy(char * c) {
 
 
 
-int main() {
+/*int main() {
 	//test_SingletonHungry();
 	//test_SingletonsLazy();
 	//char* p = nullptr;
@@ -129,5 +129,6 @@ int main() {
 
 	unique_ptr<int> u_ptr = make_unique<int>(114514);
 	cout << *u_ptr << endl;
+	
 	return 0;
-}
+}*/
