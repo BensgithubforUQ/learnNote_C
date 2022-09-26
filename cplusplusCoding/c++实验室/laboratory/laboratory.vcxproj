@@ -127,7 +127,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="calculateFloat.cpp" />
     <ClCompile Include="templateFunc.cpp" />
+    <ClCompile Include="ownPairTest.cpp" />
     <ClCompile Include="内存分配.cpp" />
     <ClCompile Include="各种函数和关键字.cpp" />
     <ClCompile Include="多态和结构体内存对齐.cpp" />
@@ -143,6 +145,11 @@
     <ClInclude Include="factory.hpp" />
     <ClInclude Include="singleton.hpp" />
     <ClInclude Include="test.h" />
+    <ClInclude Include="myOwnPair.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="data.txt" />
+    <Text Include="data1.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

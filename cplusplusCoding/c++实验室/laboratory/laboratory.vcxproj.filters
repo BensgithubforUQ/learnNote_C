@@ -45,6 +45,12 @@
     <ClCompile Include="templateFunc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="calculateFloat.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ownPairTest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="factory.hpp">
@@ -59,5 +65,16 @@
     <ClInclude Include="test.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="myOwnPair.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="data.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="data1.txt">
+      <Filter>资源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>

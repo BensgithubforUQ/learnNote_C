@@ -18,8 +18,16 @@ void func(const T& param) {
 
 int test_114 = 114514;
 
-int main() {
-	func("abc");
+
+struct Node {
+	int val;
+	struct Node* next;
+	Node(int x):val(x),next(nullptr){}
+};
+
+
+//int main() {
+	/*func("abc");
 	cout << "p2:" << (int)&p2 << " s2:" << (int)&s2 << endl;
 	static int s4 = 2;
 	int s5 = 3;
@@ -40,6 +48,12 @@ int main() {
 	s4 = 5;
 	cout << x << " " <<s4<< endl;
 
-	printTest(10);
-	return 0;
-}
+	printTest(10);*/
+
+	//int* test_a = (int*)malloc(0);
+	//cout << sizeof(&test_a) << endl << test_a << endl;
+	//free(test_a);
+
+	//cout << sizeof(&test_a) << endl << test_a << endl;
+//	return 0;
+//}

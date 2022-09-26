@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 using namespace std;
-
+//
 //int main() {
 //	char a[] = "abcde"; //字符串
 //	char b[6] = { 'a','b','c','d','e' }; //字符型数组,同时是字符串
