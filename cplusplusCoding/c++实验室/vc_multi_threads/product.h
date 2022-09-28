@@ -15,6 +15,8 @@ private:
 class abstractProduct 
 {
 public:
+	PRODUCT_TYPE pType;
+public:
 	virtual ~abstractProduct() = 0 
 	{
 		
@@ -59,16 +61,11 @@ private:
 class Hamburger : public abstractProduct
 {
 public:
+
+public:
 	virtual ~Hamburger()
 	{
 
-	}
-
-	Hamburger()
-	{
-		set_strProductName("");
-		set_doubleProductPrice(0.00);
-		set_longProductId(0);
 	}
 
 	Hamburger(std::string _name, double _price, long _id)
@@ -76,6 +73,45 @@ public:
 		set_strProductName(_name);
 		set_doubleProductPrice(_price);
 		set_longProductId(_id);
+		pType = m_hamburger;
+	}
+private:
+
+};
+
+class Lamian : public abstractProduct
+{
+public:
+	virtual ~Lamian()
+	{
+
+	}
+
+	Lamian(std::string _name, double _price, long _id)
+	{
+		set_strProductName(_name);
+		set_doubleProductPrice(_price);
+		set_longProductId(_id);
+		pType = m_lamian;
+	}
+private:
+
+};
+
+class Cookie : public abstractProduct
+{
+public:
+	virtual ~Cookie()
+	{
+
+	}
+
+	Cookie(std::string _name, double _price, long _id)
+	{
+		set_strProductName(_name);
+		set_doubleProductPrice(_price);
+		set_longProductId(_id);
+		pType = m_cookie;
 	}
 private:
 

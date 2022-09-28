@@ -58,6 +58,8 @@ bool produce(Person * productMaker)
 		}
 
 		PERSON_TYPE perType = productMaker->personType;
+
+		/*多种商品的创建*/
 		switch (perType)
 		{
 		case m_hamburgerMaker:
@@ -68,7 +70,7 @@ bool produce(Person * productMaker)
 				vecProduct.push_back(new Hamburger("hamburger", 2.00, i));
 				++intProductCount;
 				std::cout << "thread " << std::this_thread::get_id() << " producer make a hamburger";
-				std::cout<<"size : " << intProductCount << std::endl;
+				std::cout<<" size : " << intProductCount << std::endl;
 			}
 			break;
 		default:
@@ -89,7 +91,6 @@ void consum(Person* customer)
 	while (1)
 	{
 
-		
 		std::unique_lock<std::mutex> uni_mtxPrduct(mtxPrduct);
 
 		if (vecProduct.empty())
@@ -104,8 +105,6 @@ void consum(Person* customer)
 				condi_empty.wait(uni_mtxPrduct);
 			}
 		}
-
-		
 		
 		for (int i = 0; i < customer->get_int_handleCount() && !vecProduct.empty(); i++)
 		{
