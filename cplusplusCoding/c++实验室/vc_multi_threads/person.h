@@ -2,6 +2,17 @@
 
 #include <iostream>
 
+
+enum PRODUCT_TYPE
+{
+	m_hamburger = 1, m_lamian = 2, m_cookie = 3
+};
+
+enum PERSON_TYPE
+{
+	m_customer = 0, m_hamburgerMaker = 1 
+};
+
 /******************
 * class : person 生产者消费者模型基类
 * value :
@@ -61,15 +72,14 @@ public:
 	
 protected:
 
+public:
+	PERSON_TYPE personType;
 private:
 	static int _stat_int_PersonAmount;
 	int _int_handleCount;
+	
 };
 
 /*初始化person类的static int变量*/
 int Person::_stat_int_PersonAmount = 0;
 
-enum PRODUCT_TYPE
-{
-	hamburger = 1, lamian = 2, cookie = 3
-};

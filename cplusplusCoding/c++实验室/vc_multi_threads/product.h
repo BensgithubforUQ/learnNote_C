@@ -25,27 +25,27 @@ public:
 		return _strProductName =  _name ;
 	}
 
-	double set_strProductPrice(double _price)
+	double set_doubleProductPrice(double _price)
 	{
 		return _doubleProductPrice =  _price ;
 	}
 
-	std::string set_strProductId(std::string id)
+	long set_longProductId(long id)
 	{
-		return _strProductId = id ;
+		return _longProductId = id ;
 	}
 
 	void showAll()
 	{
 		std::cout << _strProductName << " "
 			<< _doubleProductPrice << " "
-			<< _strProductId << " " << std::endl;
+			<< _longProductId << " " << std::endl;
 	}
 protected:
 private:
 	std::string  _strProductName; // {}
 	double  _doubleProductPrice; //[]
-	std::string  _strProductId; //()
+	long  _longProductId; //()
 };
 
 /******************
@@ -67,15 +67,15 @@ public:
 	Hamburger()
 	{
 		set_strProductName("");
-		set_strProductPrice(0.00);
-		set_strProductId("h000000");
+		set_doubleProductPrice(0.00);
+		set_longProductId(0);
 	}
 
-	Hamburger(std::string _name, double _price, std::string _id)
+	Hamburger(std::string _name, double _price, long _id)
 	{
 		set_strProductName(_name);
-		set_strProductPrice(_price);
-		set_strProductId(_id);
+		set_doubleProductPrice(_price);
+		set_longProductId(_id);
 	}
 private:
 
