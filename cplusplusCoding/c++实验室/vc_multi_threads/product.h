@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cassert>
 
 
 /******************
@@ -35,6 +36,26 @@ public:
 	long set_longProductId(long id)
 	{
 		return _longProductId = id ;
+	}
+
+	friend std::string get_strProductName(abstractProduct &absP)
+	{
+		if (!absP._strProductName.empty())
+		{
+			if (!absP._strProductName.empty())
+				std::cout << "error£¬empty _strProductName" << std::endl;
+		}
+		return absP._strProductName;
+	}
+
+	friend double get_doubleProductPrice(abstractProduct& absP)
+	{
+		return absP._doubleProductPrice;
+	}
+
+	friend long gett_longProductId(abstractProduct& absP)
+	{
+		return absP._longProductId;
 	}
 
 	void showAll()

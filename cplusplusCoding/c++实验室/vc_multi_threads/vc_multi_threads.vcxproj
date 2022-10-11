@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="cpModel.h" />
+    <ClInclude Include="ioProduct.h" />
     <ClInclude Include="producer.h" />
     <ClInclude Include="person.h" />
     <ClInclude Include="customer.h" />
@@ -136,6 +137,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="log.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

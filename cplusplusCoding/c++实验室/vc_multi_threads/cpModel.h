@@ -10,6 +10,7 @@
 #include <stack>
 #include <time.h>
 #include <thread>
+#include "ioProduct.h"
 
 
 //enum PRODUCT_TYPE
@@ -56,7 +57,7 @@ bool produce(Person * productMaker)
 			condi_full.wait(uni_mtxPrduct);
 			return false;
 		}
-
+		
 		PERSON_TYPE perType = productMaker->personType;
 
 		/*多种商品的创建*/
@@ -69,8 +70,10 @@ bool produce(Person * productMaker)
 			{
 				vecProduct.push_back(new Hamburger("hamburger", 2.00, i));
 				++intProductCount;
-				std::cout << "thread " << std::this_thread::get_id() << " producer make a hamburger";
+				std::cout << "thread ： " << std::this_thread::get_id() << " producer make a hamburger";
 				std::cout<<" size : " << intProductCount << std::endl;
+
+				saveProductInfo(*productMaker, *vecProduct.back());
 			}
 			break;
 		default:
@@ -108,7 +111,7 @@ void consum(Person* customer)
 		
 		for (int i = 0; i < customer->get_int_handleCount() && !vecProduct.empty(); i++)
 		{
-			std::cout << "thread " << std::this_thread::get_id() << " producer eat a hamburger, left "
+			std::cout << "thread " << std::this_thread::get_id() << " customer eat a hamburger, left "
 				<< vecProduct.size() - 1 <<" remain." <<std::endl;
 			//vecProduct.back()->showAll();
 			vecProduct.pop_back();

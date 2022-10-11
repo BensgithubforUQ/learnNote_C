@@ -49,7 +49,6 @@ namespace ben{
 		for (int i = 0; i < 15; i++)
 		{
 			testThread[i].join();
-			
 		}
 	}
 }
